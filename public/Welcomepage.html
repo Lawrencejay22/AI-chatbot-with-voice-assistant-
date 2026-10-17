@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Welcome to Buddy • Your Friendly AI Companion</title>
+  <meta name="description"
+    content="Welcome to Buddy - Your friendly AI voice companion powered by GPT and ElevenLabs." />
+  <link rel="icon" type="image/svg+xml" href="logo.svg?v=4" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body class="standalone-welcome-page">
+  <div class="bg-effects" aria-hidden="true">
+    <div class="glow-orb orb-1"></div>
+    <div class="glow-orb orb-2"></div>
+    <div class="glow-orb orb-3"></div>
+    <div class="topography-waves">
+      <svg viewBox="0 0 1440 900" preserveAspectRatio="none" fill="none">
+        <path d="M-100,200 C300,50 600,350 1000,180 C1300,30 1500,250 1600,150" stroke="rgba(168, 85, 247, 0.12)"
+          stroke-width="1.5" stroke-dasharray="6 6" />
+        <path d="M-100,280 C320,130 650,420 1050,260 C1320,110 1520,320 1600,220" stroke="rgba(168, 85, 247, 0.08)"
+          stroke-width="1.5" />
+        <path d="M-100,380 C350,220 700,500 1100,340 C1350,190 1550,400 1600,300" stroke="rgba(168, 85, 247, 0.14)"
+          stroke-width="2" />
+        <path d="M-100,500 C400,340 750,600 1180,450 C1400,300 1580,510 1600,420" stroke="rgba(139, 92, 246, 0.09)"
+          stroke-width="1.5" stroke-dasharray="4 4" />
+        <path d="M-100,650 C450,480 820,720 1240,580 C1440,420 1600,640 1600,540" stroke="rgba(168, 85, 247, 0.15)"
+          stroke-width="2" />
+        <circle cx="280" cy="220" r="3" fill="#a855f7" opacity="0.6" />
+        <circle cx="850" cy="380" r="2.5" fill="#38bdf8" opacity="0.5" />
+        <circle cx="1200" cy="180" r="3.5" fill="#c084fc" opacity="0.7" />
+        <circle cx="1050" cy="650" r="3" fill="#818cf8" opacity="0.4" />
+      </svg>
+    </div>
+  </div>
+
+  <main class="welcome-page-container">
+    <div class="pill-badge" id="welcome-badge">
+      <img src="logo.svg?v=4" alt="Buddy Logo" class="badge-mini-logo" width="18" height="18" />
+      <span>Buddy • AI Companion 👋</span>
+    </div>
+
+    <div class="robot-stage">
+      <div class="robot-glow-back"></div>
+
+      <div class="floating-prism prism-1"></div>
+      <div class="floating-prism prism-2"></div>
+      <div class="floating-prism prism-3"></div>
+
+      <div class="robot-model-wrap" id="robot-avatar-graphic">
+        <svg viewBox="0 0 400 440" class="robot-svg" id="interactive-robot-svg">
+          <defs>
+            <linearGradient id="bodyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#ffffff" />
+              <stop offset="45%" stop-color="#f1f5f9" />
+              <stop offset="85%" stop-color="#cbd5e1" />
+              <stop offset="100%" stop-color="#94a3b8" />
+            </linearGradient>
+            <linearGradient id="chromeGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#e2e8f0" />
+              <stop offset="50%" stop-color="#64748b" />
+              <stop offset="100%" stop-color="#1e293b" />
+            </linearGradient>
+            <linearGradient id="visorGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#0f172a" />
+              <stop offset="60%" stop-color="#1e1b4b" />
+              <stop offset="100%" stop-color="#090514" />
+            </linearGradient>
+            <linearGradient id="cyanEyeGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#38bdf8" />
+              <stop offset="50%" stop-color="#00f2fe" />
+              <stop offset="100%" stop-color="#0284c7" />
+            </linearGradient>
+            <linearGradient id="purpleRingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#c084fc" />
+              <stop offset="100%" stop-color="#7c3aed" />
+            </linearGradient>
+            <filter id="glowFilter" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur stdDeviation="6" result="blur" />
+              <feComposite in="SourceGraphic" in2="blur" operator="over" />
+            </filter>
+          </defs>
+
+          <ellipse cx="200" cy="400" rx="90" ry="18" fill="rgba(168, 85, 247, 0.28)"
+            filter="url(#glowFilter)" />
+
+          <g class="robot-animated-group">
+            <line x1="200" y1="110" x2="200" y2="70" stroke="url(#chromeGrad)" stroke-width="6"
+              stroke-linecap="round" />
+            <circle cx="200" cy="65" r="9" fill="url(#cyanEyeGlow)" filter="url(#glowFilter)"
+              class="antenna-bulb" />
+
+            <rect x="78" y="145" width="22" height="42" rx="9" fill="url(#purpleRingGrad)" />
+            <circle cx="89" cy="166" r="6" fill="#38bdf8" filter="url(#glowFilter)" />
+
+            <rect x="300" y="145" width="22" height="42" rx="9" fill="url(#purpleRingGrad)" />
+            <circle cx="311" cy="166" r="6" fill="#38bdf8" filter="url(#glowFilter)" />
+
+            <rect x="94" y="98" width="212" height="150" rx="65" fill="url(#bodyGrad)" stroke="#e2e8f0"
+              stroke-width="3" />
+
+            <rect x="114" y="122" width="172" height="102" rx="42" fill="url(#visorGrad)"
+              stroke="rgba(168, 85, 247, 0.4)" stroke-width="2" />
+
+            <g class="robot-eyes">
+              <g class="robot-eye-left">
+                <circle cx="160" cy="172" r="24" fill="none" stroke="url(#cyanEyeGlow)" stroke-width="4.5"
+                  filter="url(#glowFilter)" />
+                <circle cx="160" cy="172" r="16" fill="url(#cyanEyeGlow)" filter="url(#glowFilter)" />
+                <circle cx="155" cy="167" r="4" fill="#ffffff" />
+              </g>
+              <g class="robot-eye-right">
+                <circle cx="240" cy="172" r="24" fill="none" stroke="url(#cyanEyeGlow)" stroke-width="4.5"
+                  filter="url(#glowFilter)" />
+                <circle cx="240" cy="172" r="16" fill="url(#cyanEyeGlow)" filter="url(#glowFilter)" />
+                <circle cx="235" cy="167" r="4" fill="#ffffff" />
+              </g>
+            </g>
+
+            <path d="M184 204 Q200 214 216 204" stroke="#38bdf8" stroke-width="3" stroke-linecap="round"
+              fill="none" filter="url(#glowFilter)" />
+
+            <rect x="180" y="248" width="40" height="20" rx="6" fill="url(#chromeGrad)" />
+
+            <path
+              d="M128 266 L272 266 C288 266 298 280 292 296 L276 348 C270 366 254 378 234 378 L166 378 C146 378 130 366 124 348 L108 296 C102 280 112 266 128 266 Z"
+              fill="url(#bodyGrad)" stroke="#cbd5e1" stroke-width="2" />
+
+            <circle cx="200" cy="316" r="20" fill="url(#visorGrad)" stroke="rgba(168, 85, 247, 0.6)"
+              stroke-width="2" />
+            <circle cx="200" cy="316" r="12" fill="url(#cyanEyeGlow)" filter="url(#glowFilter)"
+              class="core-energy-pulse" />
+            <circle cx="200" cy="316" r="6" fill="#ffffff" />
+
+            <g class="robot-hand-left">
+              <rect x="76" y="280" width="34" height="42" rx="14" fill="url(#bodyGrad)" stroke="#cbd5e1"
+                stroke-width="2" />
+              <circle cx="93" cy="301" r="5" fill="#38bdf8" filter="url(#glowFilter)" />
+            </g>
+            <g class="robot-hand-right">
+              <rect x="290" y="280" width="34" height="42" rx="14" fill="url(#bodyGrad)" stroke="#cbd5e1"
+                stroke-width="2" />
+              <circle cx="307" cy="301" r="5" fill="#38bdf8" filter="url(#glowFilter)" />
+            </g>
+          </g>
+        </svg>
+      </div>
+    </div>
+
+    <div class="welcome-text-wrap">
+      <h1 class="welcome-title">Your AI-Powered<br />Workspace</h1>
+      <p class="welcome-sub">Hey <span id="welcome-user-name">Sakib</span>! Welcome to your ultimate AI-powered workspace! Whether you want to talk hands-free using voice commands, brainstorm ideas through interactive chat, or explore visuals with instant image search, this app is designed to bring your creativity to life. Jump right in, pick a feature, and see how easy it is to get things done.</p>
+    </div>
+
+    <div class="welcome-action-wrap">
+      <a href="index.html" class="btn-get-started" id="get-started-btn">
+        <span>Get Started</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="18" height="18">
+          <path d="M5 12h14M12 5l7 7-7 7" />
+        </svg>
+      </a>
+    </div>
+  </main>
+
+  <script>
+    (() => {
+      const storedName = localStorage.getItem('ai_buddy_user_name') || 'Sakib';
+      const nameEl = document.getElementById('welcome-user-name');
+      if (nameEl) nameEl.textContent = storedName;
+    })();
+  </script>
+</body>
+
+</html>

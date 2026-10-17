@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Buddy • Your Friendly AI Companion</title>
+  <meta name="description"
+    content="Buddy - Your friendly AI voice companion powered by GPT and ElevenLabs. Responsive on both mobile and desktop." />
+  <link rel="icon" type="image/svg+xml" href="logo.svg?v=4" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body class="desktop-mode">
+  <div class="bg-effects" aria-hidden="true">
+    <div class="glow-orb orb-1"></div>
+    <div class="glow-orb orb-2"></div>
+    <div class="glow-orb orb-3"></div>
+    <div class="topography-waves">
+      <svg viewBox="0 0 1440 900" preserveAspectRatio="none" fill="none">
+        <path d="M-100,200 C300,50 600,350 1000,180 C1300,30 1500,250 1600,150" stroke="rgba(168, 85, 247, 0.12)"
+          stroke-width="1.5" stroke-dasharray="6 6" />
+        <path d="M-100,280 C320,130 650,420 1050,260 C1320,110 1520,320 1600,220" stroke="rgba(168, 85, 247, 0.08)"
+          stroke-width="1.5" />
+        <path d="M-100,380 C350,220 700,500 1100,340 C1350,190 1550,400 1600,300" stroke="rgba(168, 85, 247, 0.14)"
+          stroke-width="2" />
+        <path d="M-100,500 C400,340 750,600 1180,450 C1400,300 1580,510 1600,420" stroke="rgba(139, 92, 246, 0.09)"
+          stroke-width="1.5" stroke-dasharray="4 4" />
+        <path d="M-100,650 C450,480 820,720 1240,580 C1440,420 1600,640 1600,540" stroke="rgba(168, 85, 247, 0.15)"
+          stroke-width="2" />
+        <circle cx="280" cy="220" r="3" fill="#a855f7" opacity="0.6" />
+        <circle cx="850" cy="380" r="2.5" fill="#38bdf8" opacity="0.5" />
+        <circle cx="1200" cy="180" r="3.5" fill="#c084fc" opacity="0.7" />
+        <circle cx="1050" cy="650" r="3" fill="#818cf8" opacity="0.4" />
+      </svg>
+    </div>
+  </div>
+
+  <div class="app-layout" id="app-layout">
+    <header class="desktop-topbar">
+      <div class="brand-group" id="topbar-brand-home" role="button" tabindex="0" title="Buddy • AI Companion">
+        <div class="brand-icon-wrap" title="Buddy AI">
+          <img src="logo.svg?v=4" alt="Buddy Logo" class="brand-logo-img" />
+        </div>
+        <div class="brand-details">
+          <span class="brand-title">Buddy • AI Companion 👋</span>
+          <span class="brand-subtitle">Always here to chat & listen ✨</span>
+        </div>
+      </div>
+
+      <div class="desktop-top-center">
+        <div class="status-chip" id="connection-status-chip" title="Service connection status">
+          <span class="pulse-dot"></span>
+          <span class="status-label">Online</span>
+        </div>
+        <div class="voice-badge" id="active-voice-badge">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14">
+            <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z" />
+            <path
+              d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z" />
+          </svg>
+          <span id="active-voice-name">Voice: Sarah</span>
+        </div>
+      </div>
+
+      <div class="desktop-top-actions">
+        <a href="Welcomepage.html" class="topbar-btn" id="open-welcome-btn" title="View Welcome Page">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+            <circle cx="12" cy="12" r="10" />
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+            <line x1="12" y1="17" x2="12.01" y2="17" />
+          </svg>
+        </a>
+
+        <div class="user-avatar-pill" id="profile-pill" title="Sakib Profile">
+          <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80"
+            alt="Sakib Profile" class="avatar-img" id="user-avatar-img" />
+          <span class="user-greeting-name">Sakib</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="main-shell" id="main-shell">
+      <aside class="desktop-sidebar" id="desktop-sidebar">
+        <div class="sidebar-brand" id="sidebar-brand-home" role="button" tabindex="0" title="Buddy • AI Companion">
+          <img src="logo.svg?v=4" alt="Buddy AI" class="sidebar-logo-img" />
+          <div class="sidebar-brand-text">
+            <span class="sidebar-brand-name">Buddy • AI Companion 👋</span>
+            <span class="sidebar-brand-desc">Always here to chat & listen ✨</span>
+          </div>
+        </div>
+
+        <div class="sidebar-nav">
+          <button type="button" class="nav-item active" data-tab="home" id="side-nav-home">
+            <span class="nav-icon">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+              </svg>
+            </span>
+            <span class="nav-label">Home</span>
+          </button>
+
+          <button type="button" class="nav-item" data-tab="chat" id="side-nav-chat">
+            <span class="nav-icon">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z" />
+              </svg>
+            </span>
+            <span class="nav-label">Ai Chat</span>
+            <span class="nav-badge" id="chat-count-badge">Live</span>
+          </button>
+
+          <button type="button" class="nav-item" data-tab="voices" id="side-nav-voices">
+            <span class="nav-icon">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" />
+              </svg>
+            </span>
+            <span class="nav-label">Voices</span>
+          </button>
+
+          <button type="button" class="nav-item" data-tab="settings" id="side-nav-settings">
+            <span class="nav-icon">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z" />
+              </svg>
+            </span>
+            <span class="nav-label">Settings</span>
+          </button>
+        </div>
+
+        <div class="sidebar-history-box">
+          <div class="history-box-header">
+            <span>Recent Chats</span>
+            <button type="button" class="icon-tiny-btn" id="new-chat-side-btn" title="Start New Chat">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="14" height="14">
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+            </button>
+          </div>
+          <div class="sidebar-history-list" id="sidebar-history-list">
+          </div>
+        </div>
+
+        <div class="sidebar-footer">
+          <div class="footer-user">
+            <div class="avatar-wrap">
+              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80"
+                alt="Sakib" />
+              <span class="status-indicator-dot"></span>
+            </div>
+            <div class="footer-user-info">
+              <span class="user-name">Sakib</span>
+              <span class="user-sub">Free Plan</span>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <div class="device-frame" id="device-frame">
+
+        <div class="mobile-phone-notch" id="mobile-notch">
+          <div class="notch-time" id="notch-current-time">9:41</div>
+          <div class="dynamic-island" id="dynamic-island">
+            <div class="island-eq hidden" id="island-eq">
+              <span></span><span></span><span></span>
+            </div>
+          </div>
+          <div class="notch-icons">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14">
+              <path
+                d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 19.4c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.9-1.9C9.17 19.58 10.53 20 12 20c4.97 0 9-4.03 9-9s-4.03-9-9-9zm0 15c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z" />
+            </svg>
+            <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14">
+              <path
+                d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z" />
+            </svg>
+          </div>
+        </div>
+
+        <div id="banner" class="banner hidden"></div>
+
+        <section class="screen-view welcome-screen" id="welcome-screen">
+          <div class="welcome-content">
+            <div class="pill-badge" id="welcome-badge">
+              <img src="logo.svg?v=4" alt="Logo" class="badge-mini-logo" width="18" height="18" />
+              <span>Buddy • AI Companion</span>
+            </div>
+
+            <div class="robot-stage">
+              <div class="robot-glow-back"></div>
+
+              <div class="floating-prism prism-1"></div>
+              <div class="floating-prism prism-2"></div>
+              <div class="floating-prism prism-3"></div>
+
+              <div class="robot-model-wrap" id="robot-avatar-graphic">
+                <svg viewBox="0 0 400 440" class="robot-svg" id="interactive-robot-svg">
+                  <defs>
+                    <linearGradient id="bodyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stop-color="#ffffff" />
+                      <stop offset="45%" stop-color="#f1f5f9" />
+                      <stop offset="85%" stop-color="#cbd5e1" />
+                      <stop offset="100%" stop-color="#94a3b8" />
+                    </linearGradient>
+                    <linearGradient id="chromeGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                      <stop offset="0%" stop-color="#e2e8f0" />
+                      <stop offset="50%" stop-color="#64748b" />
+                      <stop offset="100%" stop-color="#1e293b" />
+                    </linearGradient>
+                    <linearGradient id="visorGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                      <stop offset="0%" stop-color="#0f172a" />
+                      <stop offset="60%" stop-color="#1e1b4b" />
+                      <stop offset="100%" stop-color="#090514" />
+                    </linearGradient>
+                    <linearGradient id="cyanEyeGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stop-color="#38bdf8" />
+                      <stop offset="50%" stop-color="#00f2fe" />
+                      <stop offset="100%" stop-color="#0284c7" />
+                    </linearGradient>
+                    <linearGradient id="purpleRingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stop-color="#c084fc" />
+                      <stop offset="100%" stop-color="#7c3aed" />
+                    </linearGradient>
+                    <filter id="glowFilter" x="-20%" y="-20%" width="140%" height="140%">
+                      <feGaussianBlur stdDeviation="6" result="blur" />
+                      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                    </filter>
+                  </defs>
+
+                  <ellipse cx="200" cy="400" rx="90" ry="18" fill="rgba(168, 85, 247, 0.28)"
+                    filter="url(#glowFilter)" />
+
+                  <g class="robot-animated-group">
+                    <line x1="200" y1="110" x2="200" y2="70" stroke="url(#chromeGrad)" stroke-width="6"
+                      stroke-linecap="round" />
+                    <circle cx="200" cy="65" r="9" fill="url(#cyanEyeGlow)" filter="url(#glowFilter)"
+                      class="antenna-bulb" />
+
+                    <rect x="78" y="145" width="22" height="42" rx="9" fill="url(#purpleRingGrad)" />
+                    <circle cx="89" cy="166" r="6" fill="#38bdf8" filter="url(#glowFilter)" />
+
+                    <rect x="300" y="145" width="22" height="42" rx="9" fill="url(#purpleRingGrad)" />
+                    <circle cx="311" cy="166" r="6" fill="#38bdf8" filter="url(#glowFilter)" />
+
+                    <rect x="94" y="98" width="212" height="150" rx="65" fill="url(#bodyGrad)" stroke="#e2e8f0"
+                      stroke-width="3" />
+
+                    <rect x="114" y="122" width="172" height="102" rx="42" fill="url(#visorGrad)"
+                      stroke="rgba(168, 85, 247, 0.4)" stroke-width="2" />
+
+                    <g class="robot-eyes">
+                      <g class="robot-eye-left">
+                        <circle cx="160" cy="172" r="24" fill="none" stroke="url(#cyanEyeGlow)" stroke-width="4.5"
+                          filter="url(#glowFilter)" />
+                        <circle cx="160" cy="172" r="16" fill="url(#cyanEyeGlow)" filter="url(#glowFilter)" />
+                        <circle cx="155" cy="167" r="4" fill="#ffffff" />
+                      </g>
+                      <g class="robot-eye-right">
+                        <circle cx="240" cy="172" r="24" fill="none" stroke="url(#cyanEyeGlow)" stroke-width="4.5"
+                          filter="url(#glowFilter)" />
+                        <circle cx="240" cy="172" r="16" fill="url(#cyanEyeGlow)" filter="url(#glowFilter)" />
+                        <circle cx="235" cy="167" r="4" fill="#ffffff" />
+                      </g>
+                    </g>
+
+                    <path d="M184 204 Q200 214 216 204" stroke="#38bdf8" stroke-width="3" stroke-linecap="round"
+                      fill="none" filter="url(#glowFilter)" />
+
+                    <rect x="180" y="248" width="40" height="20" rx="6" fill="url(#chromeGrad)" />
+
+                    <path
+                      d="M128 266 L272 266 C288 266 298 280 292 296 L276 348 C270 366 254 378 234 378 L166 378 C146 378 130 366 124 348 L108 296 C102 280 112 266 128 266 Z"
+                      fill="url(#bodyGrad)" stroke="#cbd5e1" stroke-width="2" />
+
+                    <circle cx="200" cy="316" r="20" fill="url(#visorGrad)" stroke="rgba(168, 85, 247, 0.6)"
+                      stroke-width="2" />
+                    <circle cx="200" cy="316" r="12" fill="url(#cyanEyeGlow)" filter="url(#glowFilter)"
+                      class="core-energy-pulse" />
+                    <circle cx="200" cy="316" r="6" fill="#ffffff" />
+
+                    <g class="robot-hand-left">
+                      <rect x="76" y="280" width="34" height="42" rx="14" fill="url(#bodyGrad)" stroke="#cbd5e1"
+                        stroke-width="2" />
+                      <circle cx="93" cy="301" r="5" fill="#38bdf8" filter="url(#glowFilter)" />
+                    </g>
+                    <g class="robot-hand-right">
+                      <rect x="290" y="280" width="34" height="42" rx="14" fill="url(#bodyGrad)" stroke="#cbd5e1"
+                        stroke-width="2" />
+                      <circle cx="307" cy="301" r="5" fill="#38bdf8" filter="url(#glowFilter)" />
+                    </g>
+                  </g>
+                </svg>
+              </div>
+            </div>
+
+            <div class="welcome-text-wrap">
+              <h1 class="welcome-title">Your AI-Powered<br />Workspace</h1>
+              <p class="welcome-sub">HI! Welcome to your ultimate AI-powered workspace! Whether you want to talk
+                hands-free using voice commands, brainstorm ideas through interactive chat, or explore visuals with
+                instant image search, this app is designed to bring your creativity to life. Jump right in, pick a
+                feature, and see how easy it is to get things done.</p>
+            </div>
+
+            <div class="welcome-action-wrap">
+              <button type="button" class="btn-get-started" id="get-started-btn">
+                <span>Get Started</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="18" height="18">
+                  <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <section class="screen-view home-screen active" id="home-screen">
+          <div class="screen-header">
+            <div class="mobile-header-left">
+              <div class="mobile-brand-emblem" id="mobile-brand-home" role="button" tabindex="0"
+                title="Buddy • AI Companion">
+                <img src="logo.svg?v=4" alt="Buddy Logo" class="mobile-logo-img" />
+                <span class="mobile-logo-text">Buddy AI 👋</span>
+              </div>
+            </div>
+
+            <div class="header-status-pill">
+              <span class="status-green-dot"></span>
+              <span>Online</span>
+            </div>
+
+            <div class="header-user-avatar" id="header-avatar-btn">
+              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80"
+                alt="Sakib Profile" />
+            </div>
+          </div>
+
+          <div class="home-scroll-container">
+            <div class="user-greeting-section">
+              <div class="greeting-pre">Hi, <span class="dynamic-user-name">Sakib</span> <span
+                  class="wave-hand">👋</span></div>
+              <h2 class="greeting-main">How may I help you<br />today?</h2>
+            </div>
+
+            <div class="action-cards-grid">
+              <div class="action-card talk-card" id="card-talk-bot" role="button" tabindex="0">
+                <div class="card-arrow-wrap">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <line x1="7" y1="17" x2="17" y2="7" />
+                    <polyline points="7 7 17 7 17 17" />
+                  </svg>
+                </div>
+                <div class="card-icon-circle">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                    <line x1="12" y1="19" x2="12" y2="23" />
+                    <line x1="8" y1="23" x2="16" y2="23" />
+                  </svg>
+                </div>
+                <div class="card-title">Talk with<br />Bot</div>
+                <div class="card-sub-tip">Voice speaking & listening</div>
+              </div>
+
+              <div class="action-card chat-card" id="card-chat-bot" role="button" tabindex="0">
+                <div class="card-arrow-wrap">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <line x1="7" y1="17" x2="17" y2="7" />
+                    <polyline points="7 7 17 7 17 17" />
+                  </svg>
+                </div>
+                <div class="card-icon-circle mini">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path
+                      d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+                  </svg>
+                </div>
+                <div class="card-title-sm">Chat with Bot</div>
+              </div>
+
+              <div class="action-card image-card" id="card-prompt-bot" role="button" tabindex="0">
+                <div class="card-arrow-wrap">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <line x1="7" y1="17" x2="17" y2="7" />
+                    <polyline points="7 7 17 7 17 17" />
+                  </svg>
+                </div>
+                <div class="card-icon-circle mini">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                    <circle cx="8.5" cy="8.5" r="1.5" />
+                    <polyline points="21 15 16 10 5 21" />
+                  </svg>
+                </div>
+                <div class="card-title-sm">Search by Image</div>
+              </div>
+            </div>
+
+            <div class="history-section">
+              <div class="section-title-row">
+                <h3 class="section-heading">History</h3>
+                <button type="button" class="btn-see-all" id="history-see-all-btn">See all</button>
+              </div>
+
+              <div class="history-card-list" id="home-history-list">
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="screen-view chat-screen" id="chat-screen">
+          <div class="chat-header">
+            <button type="button" class="back-btn" id="chat-back-btn" aria-label="Back to home">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="20" height="20">
+                <path d="M15 18l-6-6 6-6" />
+              </svg>
+              <span>Back</span>
+            </button>
+
+            <div class="chat-header-center">
+              <h2 class="chat-title">Ai Chat</h2>
+              <span class="chat-voice-pill" id="chat-voice-label" title="Current assistant voice">Sarah</span>
+            </div>
+
+            <div class="chat-header-actions">
+              <button type="button" class="icon-tiny-btn" id="chat-new-btn" title="New Chat (+)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="16" height="16">
+                  <line x1="12" y1="5" x2="12" y2="19" />
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
+              </button>
+              <button type="button" class="icon-tiny-btn" id="chat-clear-btn" title="Delete conversation">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                  <polyline points="3 6 5 6 21 6" />
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                </svg>
+              </button>
+              <button type="button" class="icon-tiny-btn" id="chat-voice-toggle-btn" title="Toggle audio read aloud">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16" id="speaker-icon">
+                  <path
+                    d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="chat-messages" id="chat" aria-live="polite">
+          </div>
+
+          <div id="speak-status" class="speak-status hidden" role="button" tabindex="0" title="Click to stop voice">
+            <span class="eq-bars" aria-hidden="true">
+              <i></i><i></i><i></i><i></i><i></i>
+            </span>
+            <span class="speak-status-text">Speaking aloud — tap to stop</span>
+          </div>
+
+          <div class="voice-talk-overlay hidden" id="voice-talk-overlay">
+            <button type="button" class="close-overlay-btn" id="close-voice-overlay-btn">✕</button>
+            <div class="voice-radar">
+              <div class="radar-circle circle-1"></div>
+              <div class="radar-circle circle-2"></div>
+              <div class="radar-circle circle-3"></div>
+              <div class="radar-core">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="36" height="36">
+                  <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+                  <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                  <line x1="12" y1="19" x2="12" y2="23" />
+                  <line x1="8" y1="23" x2="16" y2="23" />
+                </svg>
+              </div>
+            </div>
+            <div class="voice-talk-title" id="voice-overlay-status">Listening...</div>
+            <div class="voice-talk-sub" id="voice-overlay-transcript">Speak your question clearly into your microphone
+            </div>
+            <div class="voice-talk-controls">
+              <button type="button" class="btn-voice-stop" id="btn-voice-overlay-stop">End Voice Mode</button>
+            </div>
+          </div>
+
+          <form id="input-form" class="chat-composer" autocomplete="off">
+            <div class="composer-pill">
+              <button type="button" id="mic-btn" class="composer-icon-btn mic" aria-label="Start voice input"
+                title="Speak message">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path
+                    d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5.3-3a5.3 5.3 0 0 1-10.6 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-1.7z" />
+                </svg>
+              </button>
+
+              <input id="input" type="text" placeholder="Write a message..." autocomplete="off" />
+
+              <button type="submit" id="send-btn" class="composer-icon-btn send" aria-label="Send message"
+                title="Send message">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M2.01 21 23 12 2.01 3 2 10l15 2-15 2z" />
+                </svg>
+              </button>
+            </div>
+          </form>
+        </section>
+
+        <section class="screen-view voices-screen" id="voices-screen">
+          <div class="screen-header">
+            <button type="button" class="back-btn back-to-home-btn" aria-label="Back">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="20" height="20">
+                <path d="M15 18l-6-6 6-6" />
+              </svg>
+              <span>Back</span>
+            </button>
+            <h2 class="chat-title">Voice Studio</h2>
+            <div style="width: 40px;"></div>
+          </div>
+
+          <div class="voices-scroll-container">
+            <div class="voice-header-card">
+              <div class="voice-header-icon">🎙️</div>
+              <div class="voice-header-text">
+                <h3>ElevenLabs Voice Library</h3>
+                <p>Select your favorite AI voice persona. Your assistant will speak replies in this voice.</p>
+              </div>
+            </div>
+
+            <div class="voice-selector-box">
+              <label for="voice-select-dropdown">Selected Voice</label>
+              <select id="voice-select-dropdown" class="custom-select">
+                <option value="EXAVITQu4vr4xnSDxMaL">Sarah - Mature, Reassuring, Confident</option>
+              </select>
+            </div>
+
+            <div class="voice-list-grid" id="voices-cards-container">
+            </div>
+          </div>
+        </section>
+
+        <section class="screen-view settings-screen" id="settings-screen">
+          <div class="screen-header">
+            <button type="button" class="back-btn back-to-home-btn" aria-label="Back">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="20" height="20">
+                <path d="M15 18l-6-6 6-6" />
+              </svg>
+              <span>Back</span>
+            </button>
+            <h2 class="chat-title">Settings</h2>
+            <div style="width: 40px;"></div>
+          </div>
+
+          <div class="settings-scroll-container">
+            <div class="settings-group">
+              <div class="settings-group-title">Personalization</div>
+              <div class="setting-item">
+                <label for="setting-user-name">Your Display Name</label>
+                <input type="text" id="setting-user-name" value="Sakib" class="custom-input" />
+              </div>
+            </div>
+
+            <div class="settings-group">
+              <div class="settings-group-title">Audio & Speech</div>
+              <div class="setting-item-toggle">
+                <div>
+                  <div class="toggle-title">Speak replies aloud</div>
+                  <div class="toggle-desc">Automatically read responses using ElevenLabs TTS</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="setting-speak-toggle" checked />
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+
+            <div class="settings-group">
+              <div class="settings-group-title">AI Engine Status</div>
+              <div class="api-status-card">
+                <div class="status-row">
+                  <span class="status-name">OpenAI Engine</span>
+                  <span class="status-state state-fallback" id="openai-status-indicator">Connected (Smart Fallback
+                    Active)</span>
+                </div>
+                <div class="status-row">
+                  <span class="status-name">ElevenLabs Voice</span>
+                  <span class="status-state state-active" id="elevenlabs-status-indicator">Ready (21 Voices
+                    Active)</span>
+                </div>
+              </div>
+              <div class="setting-item" style="margin-top: 12px;">
+                <label for="setting-custom-key">Custom OpenAI API Key (Optional)</label>
+                <input type="password" id="setting-custom-key" placeholder="sk-..." class="custom-input" />
+                <div class="input-helper">If you have a fresh key with credits, paste it here to use directly.</div>
+              </div>
+            </div>
+
+            <div class="settings-group">
+              <div class="settings-group-title">About</div>
+              <div class="about-card">
+                <p><strong>Buddy • AI Companion</strong></p>
+                <p>Engineered for both mobile and desktop experiences with GPT intelligence & ElevenLabs ultra-realistic
+                  voice synthesis.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <nav class="mobile-bottom-nav" id="mobile-nav">
+          <button type="button" class="tab-btn active" data-tab="home" id="tab-home">
+            <div class="tab-icon">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+              </svg>
+            </div>
+            <span class="tab-text">Home</span>
+          </button>
+
+          <button type="button" class="tab-btn" data-tab="chat" id="tab-chat">
+            <div class="tab-icon">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z" />
+              </svg>
+            </div>
+            <span class="tab-text">Chat</span>
+          </button>
+
+          <button type="button" class="tab-btn" data-tab="voices" id="tab-voices">
+            <div class="tab-icon">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" />
+              </svg>
+            </div>
+            <span class="tab-text">Friends</span>
+          </button>
+
+          <button type="button" class="tab-btn" data-tab="settings" id="tab-settings">
+            <div class="tab-icon">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z" />
+              </svg>
+            </div>
+            <span class="tab-text">Settings</span>
+          </button>
+        </nav>
+
+      </div>
+    </div>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,958 @@
+/* ==========================================================
+   AI BUDDY • APPLICATION LOGIC & VOICE ENGINE
+   Seamless Mobile & Desktop Chat Experience
+   ========================================================== */
+
+(() => {
+  const welcomeScreen = document.getElementById('welcome-screen');
+  const homeScreen = document.getElementById('home-screen');
+  const chatScreen = document.getElementById('chat-screen');
+  const voicesScreen = document.getElementById('voices-screen');
+  const settingsScreen = document.getElementById('settings-screen');
+
+  const chatEl = document.getElementById('chat');
+  const inputForm = document.getElementById('input-form');
+  const inputEl = document.getElementById('input');
+  const micBtn = document.getElementById('mic-btn');
+  const sendBtn = document.getElementById('send-btn');
+  const speakStatus = document.getElementById('speak-status');
+  const banner = document.getElementById('banner');
+
+  const voiceSelectDropdown = document.getElementById('voice-select-dropdown');
+  const activeVoiceName = document.getElementById('active-voice-name');
+  const chatVoiceLabel = document.getElementById('chat-voice-label');
+  const voicesCardsContainer = document.getElementById('voices-cards-container');
+
+  const getStartedBtn = document.getElementById('get-started-btn');
+  const openWelcomeBtn = document.getElementById('open-welcome-btn');
+  const chatBackBtn = document.getElementById('chat-back-btn');
+  const chatNewBtn = document.getElementById('chat-new-btn');
+  const chatClearBtn = document.getElementById('chat-clear-btn');
+  const chatVoiceToggleBtn = document.getElementById('chat-voice-toggle-btn');
+
+  // Quick Action Cards
+  const cardTalkBot = document.getElementById('card-talk-bot');
+  const cardChatBot = document.getElementById('card-chat-bot');
+  const cardPromptBot = document.getElementById('card-prompt-bot');
+  const historySeeAllBtn = document.getElementById('history-see-all-btn');
+
+  // Voice Talk Overlay
+  const voiceTalkOverlay = document.getElementById('voice-talk-overlay');
+  const closeVoiceOverlayBtn = document.getElementById('close-voice-overlay-btn');
+  const btnVoiceOverlayStop = document.getElementById('btn-voice-overlay-stop');
+  const voiceOverlayStatus = document.getElementById('voice-overlay-status');
+  const voiceOverlayTranscript = document.getElementById('voice-overlay-transcript');
+
+  // Notch / Status
+  const notchCurrentTime = document.getElementById('notch-current-time');
+  const islandEq = document.getElementById('island-eq');
+
+  // Settings elements
+  const settingUserName = document.getElementById('setting-user-name');
+  const settingSpeakToggle = document.getElementById('setting-speak-toggle');
+  const settingCustomKey = document.getElementById('setting-custom-key');
+  const openaiStatusIndicator = document.getElementById('openai-status-indicator');
+  const elevenlabsStatusIndicator = document.getElementById('elevenlabs-status-indicator');
+
+  const dynamicUserNames = document.querySelectorAll('.dynamic-user-name');
+  const userGreetingName = document.querySelector('.user-greeting-name');
+  const homeHistoryList = document.getElementById('home-history-list');
+  const sidebarHistoryList = document.getElementById('sidebar-history-list');
+
+  // Navigation Items
+  const navTabs = document.querySelectorAll('.tab-btn');
+  const sideNavItems = document.querySelectorAll('.nav-item');
+  const backToHomeBtns = document.querySelectorAll('.back-to-home-btn');
+
+  // --- App State ---
+  let state = {
+    currentTab: 'home',
+    userName: localStorage.getItem('ai_buddy_user_name') || 'Sakib',
+    speakReplies: localStorage.getItem('ai_buddy_speak') !== 'false',
+    selectedVoiceId: localStorage.getItem('ai_buddy_voice_id') || 'EXAVITQu4vr4xnSDxMaL',
+    selectedVoiceName: localStorage.getItem('ai_buddy_voice_name') || 'Sarah',
+    customApiKey: localStorage.getItem('ai_buddy_custom_key') || '',
+    activeSessionId: null,
+    messages: [],
+    busy: false,
+    currentAudio: null,
+    voices: []
+  };
+
+  // Seed default history items matching user's design image
+  const DEFAULT_HISTORY = [
+    {
+      id: 'session-chatgpt',
+      title: 'ChatGPT',
+      type: 'chatgpt',
+      time: '22:10',
+      preview: 'Best 2023 mobile app suggestion and architecture...',
+      messages: [
+        { role: 'user', content: 'What are the best mobile app design trends for modern AI apps?' },
+        { role: 'assistant', content: 'Modern AI apps emphasize sleek dark aesthetics, glowing violet and cyan neon accents, tactile micro-animations, and fluid voice interactions!' }
+      ]
+    },
+    {
+      id: 'session-midjourney',
+      title: 'Midjourney',
+      type: 'midjourney',
+      time: '11:23',
+      preview: 'Looking for dark UI design ideas with neon violet.',
+      messages: [
+        { role: 'user', content: 'Looking for dark UI design ideas.' },
+        { role: 'assistant', content: 'Try pairing deep obsidian space backgrounds with vibrant purple gradient cards, glassmorphic borders, and high-tech typography.' }
+      ]
+    },
+    {
+      id: 'session-googleai',
+      title: 'Google AI',
+      type: 'google',
+      time: '06:15',
+      preview: 'Show AI-inspired color palettes and gradients.',
+      messages: [
+        { role: 'user', content: 'Show AI-inspired color palettes.' },
+        { role: 'assistant', content: 'Electric violet #8b5cf6, cyber cyan #38bdf8, and dark nebula #090714 create an ultra-modern aesthetic.' }
+      ]
+    }
+  ];
+
+  // Initialize stored history or set defaults
+  let chatHistory = [];
+  try {
+    const raw = localStorage.getItem('ai_buddy_history');
+    chatHistory = raw ? JSON.parse(raw) : DEFAULT_HISTORY;
+  } catch (e) {
+    chatHistory = DEFAULT_HISTORY;
+  }
+
+  function saveHistory() {
+    try {
+      localStorage.setItem('ai_buddy_history', JSON.stringify(chatHistory));
+    } catch (e) { }
+  }
+
+  // --- Clock updater for mobile notch ---
+  function updateNotchClock() {
+    if (!notchCurrentTime) return;
+    const now = new Date();
+    let hours = now.getHours();
+    let minutes = now.getMinutes();
+    const str = `${hours % 12 || 12}:${minutes < 10 ? '0' : ''}${minutes}`;
+    notchCurrentTime.textContent = str;
+  }
+  updateNotchClock();
+  setInterval(updateNotchClock, 30000);
+
+  // --- User Name Synchronization ---
+  function updateUserName(name) {
+    state.userName = name || 'Sakib';
+    localStorage.setItem('ai_buddy_user_name', state.userName);
+    dynamicUserNames.forEach(el => el.textContent = state.userName);
+    if (userGreetingName) userGreetingName.textContent = state.userName;
+    if (settingUserName) settingUserName.value = state.userName;
+  }
+  updateUserName(state.userName);
+
+  if (settingUserName) {
+    settingUserName.addEventListener('input', (e) => {
+      updateUserName(e.target.value.trim());
+    });
+  }
+
+  // --- Banner Helper ---
+  function showBanner(text, isError = false) {
+    if (!banner) return;
+    banner.textContent = text;
+    banner.classList.remove('hidden');
+    banner.style.color = isError ? '#f87171' : '#fbbf24';
+    banner.style.borderColor = isError ? 'rgba(239, 68, 68, 0.4)' : 'rgba(245, 158, 11, 0.35)';
+  }
+
+  // --- Navigation & View Switching ---
+  function switchTab(tabId) {
+    state.currentTab = tabId;
+
+    // Hide welcome overlay if switching tabs
+    if (welcomeScreen) welcomeScreen.classList.remove('active');
+
+    // Switch view sections
+    const screens = {
+      home: homeScreen,
+      chat: chatScreen,
+      voices: voicesScreen,
+      settings: settingsScreen
+    };
+
+    Object.keys(screens).forEach(key => {
+      if (screens[key]) {
+        if (key === tabId) {
+          screens[key].classList.add('active');
+        } else {
+          screens[key].classList.remove('active');
+        }
+      }
+    });
+
+    // Update bottom nav active classes
+    navTabs.forEach(btn => {
+      if (btn.getAttribute('data-tab') === tabId) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+
+    // Update desktop sidebar nav active classes
+    sideNavItems.forEach(btn => {
+      if (btn.getAttribute('data-tab') === tabId) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+
+    if (tabId === 'chat') {
+      setTimeout(() => inputEl && inputEl.focus(), 150);
+      scrollChatToBottom();
+    }
+  }
+
+  // Attach nav events
+  navTabs.forEach(btn => {
+    btn.addEventListener('click', () => switchTab(btn.getAttribute('data-tab')));
+  });
+
+  sideNavItems.forEach(btn => {
+    btn.addEventListener('click', () => switchTab(btn.getAttribute('data-tab')));
+  });
+
+  backToHomeBtns.forEach(btn => {
+    btn.addEventListener('click', () => switchTab('home'));
+  });
+
+  const topbarBrandHome = document.getElementById('topbar-brand-home');
+  const sidebarBrandHome = document.getElementById('sidebar-brand-home');
+  const mobileBrandHome = document.getElementById('mobile-brand-home');
+  [topbarBrandHome, sidebarBrandHome, mobileBrandHome].forEach(el => {
+    if (el) {
+      el.addEventListener('click', () => {
+        if (welcomeScreen) welcomeScreen.classList.remove('active');
+        switchTab('home');
+      });
+    }
+  });
+
+  if (chatBackBtn) {
+    chatBackBtn.addEventListener('click', () => switchTab('home'));
+  }
+
+  // --- Welcome Screen Controls ---
+  if (getStartedBtn) {
+    getStartedBtn.addEventListener('click', () => {
+      welcomeScreen.classList.remove('active');
+      switchTab('home');
+    });
+  }
+
+  if (openWelcomeBtn) {
+    openWelcomeBtn.addEventListener('click', () => {
+      welcomeScreen.classList.add('active');
+    });
+  }
+
+  // --- Render History Lists ---
+  function renderHistory() {
+    if (!homeHistoryList) return;
+    homeHistoryList.innerHTML = '';
+    if (sidebarHistoryList) sidebarHistoryList.innerHTML = '';
+
+    chatHistory.slice(0, 5).forEach(item => {
+      // Home screen card
+      const card = document.createElement('div');
+      card.className = 'hist-item-card';
+      card.setAttribute('role', 'button');
+      card.setAttribute('tabindex', '0');
+
+      let iconHtml = '🤖';
+      let iconClass = 'chatgpt';
+      if (item.type === 'midjourney') {
+        iconHtml = '⛵';
+        iconClass = 'midjourney';
+      } else if (item.type === 'google') {
+        iconHtml = '✨';
+        iconClass = 'google';
+      }
+
+      card.innerHTML = `
+        <div class="hist-brand-icon ${iconClass}">${iconHtml}</div>
+        <div class="hist-details">
+          <div class="hist-title-row">
+            <span class="hist-title">${item.title}</span>
+            <span class="hist-time">${item.time}</span>
+          </div>
+          <div class="hist-preview">${item.preview}</div>
+        </div>
+        <button type="button" class="hist-del-icon-btn" title="Delete conversation" aria-label="Delete">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15">
+            <polyline points="3 6 5 6 21 6" />
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+          </svg>
+        </button>
+      `;
+
+      card.addEventListener('click', () => loadSession(item));
+      const delBtn = card.querySelector('.hist-del-icon-btn');
+      if (delBtn) {
+        delBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          deleteSessionById(item.id);
+        });
+      }
+      homeHistoryList.appendChild(card);
+
+      // Desktop sidebar item
+      if (sidebarHistoryList) {
+        const sideWrap = document.createElement('div');
+        sideWrap.className = 'side-hist-wrap';
+        if (state.activeSessionId === item.id) sideWrap.classList.add('active');
+
+        const sideItem = document.createElement('button');
+        sideItem.type = 'button';
+        sideItem.className = 'side-hist-item';
+        sideItem.innerHTML = `<span>${iconHtml}</span> <span style="overflow:hidden;text-overflow:ellipsis;">${item.title}</span>`;
+        sideItem.addEventListener('click', () => loadSession(item));
+
+        const sideDel = document.createElement('button');
+        sideDel.type = 'button';
+        sideDel.className = 'side-del-btn';
+        sideDel.title = 'Delete conversation';
+        sideDel.innerHTML = `✕`;
+        sideDel.addEventListener('click', (e) => {
+          e.stopPropagation();
+          deleteSessionById(item.id);
+        });
+
+        sideWrap.appendChild(sideItem);
+        sideWrap.appendChild(sideDel);
+        sidebarHistoryList.appendChild(sideWrap);
+      }
+    });
+  }
+
+  function deleteSessionById(sessionId) {
+    stopSpeaking();
+    chatHistory = chatHistory.filter(s => s.id !== sessionId);
+    saveHistory();
+    renderHistory();
+    if (state.activeSessionId === sessionId) {
+      deleteCurrentConversation();
+    }
+  }
+
+  function deleteCurrentConversation() {
+    stopSpeaking();
+    if (state.activeSessionId) {
+      chatHistory = chatHistory.filter(s => s.id !== state.activeSessionId);
+      saveHistory();
+      renderHistory();
+    }
+    // Delete conversation silently without sounding
+    startNewChat(false);
+    showBanner('Conversation deleted.');
+    setTimeout(() => {
+      if (banner) banner.classList.add('hidden');
+    }, 2000);
+  }
+
+  function loadSession(session) {
+    state.activeSessionId = session.id;
+    state.messages = [...(session.messages || [])];
+    renderChatMessages();
+    switchTab('chat');
+  }
+
+  // Start new chat side button (+ symbol in sidebar)
+  const newChatSideBtn = document.getElementById('new-chat-side-btn');
+  if (newChatSideBtn) {
+    newChatSideBtn.addEventListener('click', () => {
+      startNewChat(true); // Sounds the greeting once!
+      switchTab('chat');
+    });
+  }
+
+  // Start new chat button inside Ai Chat header (+ symbol)
+  if (chatNewBtn) {
+    chatNewBtn.addEventListener('click', () => {
+      startNewChat(true); // Sounds the greeting once!
+      if (inputEl) inputEl.focus();
+    });
+  }
+
+  function startNewChat(shouldSpeak = false) {
+    stopSpeaking();
+    state.activeSessionId = 'session-' + Date.now();
+    const greetingText = `Hi ${state.userName}! I am your AI Buddy. Ask me anything, or speak aloud with voice!`;
+    state.messages = [
+      {
+        role: 'assistant',
+        content: greetingText
+      }
+    ];
+    renderChatMessages();
+
+    // Speaks the greeting out loud once when requested (after deleting conversation or clicking new chat)
+    if (shouldSpeak) {
+      setTimeout(() => {
+        speak(greetingText);
+      }, 150);
+    }
+  }
+
+  // --- Render Chat Messages Stream ---
+  function renderChatMessages() {
+    if (!chatEl) return;
+    chatEl.innerHTML = '';
+    state.messages.forEach(msg => appendMessageElement(msg.role, msg.content));
+    scrollChatToBottom();
+  }
+
+  function scrollChatToBottom() {
+    if (!chatEl) return;
+    setTimeout(() => {
+      chatEl.scrollTop = chatEl.scrollHeight;
+    }, 50);
+  }
+
+  function appendMessageElement(role, text) {
+    const row = document.createElement('div');
+    row.className = `chat-msg-row ${role}`;
+
+    const isUser = role === 'user';
+    const authorName = isUser ? 'You' : 'Personal AI Buddy';
+    const authorIconHtml = isUser
+      ? `<img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" alt="You" class="author-mini-avatar"/>`
+      : `<div class="author-bot-icon">✦</div>`;
+
+    row.innerHTML = `
+      <div class="msg-author-header">
+        ${authorIconHtml}
+        <span>${authorName}</span>
+      </div>
+      <div class="msg-bubble-box">${escapeHtml(text)}</div>
+      ${!isUser ? `
+        <div class="msg-meta-footer">
+          <button type="button" class="replay-audio-btn" title="Replay voice audio">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="12" height="12">
+              <path d="M8 5v14l11-7z"/>
+            </svg>
+            Speak
+          </button>
+        </div>
+      ` : ''}
+    `;
+
+    if (!isUser) {
+      const replayBtn = row.querySelector('.replay-audio-btn');
+      if (replayBtn) {
+        replayBtn.addEventListener('click', () => speak(text));
+      }
+    }
+
+    chatEl.appendChild(row);
+    scrollChatToBottom();
+    return row;
+  }
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  function addTypingIndicator() {
+    const row = document.createElement('div');
+    row.className = 'chat-msg-row assistant typing-row';
+    row.innerHTML = `
+      <div class="msg-author-header">
+        <div class="author-bot-icon">✦</div>
+        <span>Personal AI Buddy is thinking...</span>
+      </div>
+      <div class="msg-bubble-box typing-bubble">
+        <span></span><span></span><span></span>
+      </div>
+    `;
+    chatEl.appendChild(row);
+    scrollChatToBottom();
+    return row;
+  }
+
+  // --- Voice Synthesis (ElevenLabs with Web Speech Fallback) ---
+  async function speak(text) {
+    if (!text) return;
+    stopSpeaking();
+
+    // Show equalizer UI
+    if (speakStatus) speakStatus.classList.remove('hidden');
+    if (islandEq) islandEq.classList.remove('hidden');
+
+    try {
+      const res = await fetch('/api/voice', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          text,
+          voiceId: state.selectedVoiceId
+        })
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || 'ElevenLabs synthesis failed.');
+      }
+
+      const blob = await res.blob();
+      state.currentAudio = new Audio(URL.createObjectURL(blob));
+      state.currentAudio.onended = stopSpeaking;
+      state.currentAudio.onerror = () => {
+        fallbackBrowserSpeak(text);
+      };
+      await state.currentAudio.play();
+    } catch (err) {
+      console.warn('ElevenLabs API unavailable, using browser speech synthesis fallback:', err.message);
+      fallbackBrowserSpeak(text);
+    }
+  }
+
+  function fallbackBrowserSpeak(text) {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = 1.0;
+      utterance.pitch = 1.05;
+      utterance.onend = stopSpeaking;
+      utterance.onerror = stopSpeaking;
+      window.speechSynthesis.speak(utterance);
+    } else {
+      stopSpeaking();
+    }
+  }
+
+  function stopSpeaking() {
+    if (state.currentAudio) {
+      state.currentAudio.pause();
+      state.currentAudio = null;
+    }
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
+    if (speakStatus) speakStatus.classList.add('hidden');
+    if (islandEq) islandEq.classList.add('hidden');
+  }
+
+  if (speakStatus) {
+    speakStatus.addEventListener('click', stopSpeaking);
+  }
+
+  // --- Delete Conversation / Clear Chat ---
+  if (chatClearBtn) {
+    chatClearBtn.addEventListener('click', () => {
+      deleteCurrentConversation();
+    });
+  }
+
+  // --- Audio Read Aloud Toggle ---
+  if (chatVoiceToggleBtn) {
+    chatVoiceToggleBtn.addEventListener('click', () => {
+      state.speakReplies = !state.speakReplies;
+      localStorage.setItem('ai_buddy_speak', state.speakReplies);
+      if (settingSpeakToggle) settingSpeakToggle.checked = state.speakReplies;
+      updateSpeakerIcon();
+    });
+  }
+
+  if (settingSpeakToggle) {
+    settingSpeakToggle.checked = state.speakReplies;
+    settingSpeakToggle.addEventListener('change', (e) => {
+      state.speakReplies = e.target.checked;
+      localStorage.setItem('ai_buddy_speak', state.speakReplies);
+      updateSpeakerIcon();
+    });
+  }
+
+  function updateSpeakerIcon() {
+    const speakerSvg = document.getElementById('speaker-icon');
+    if (speakerSvg) {
+      speakerSvg.style.opacity = state.speakReplies ? '1' : '0.4';
+      speakerSvg.style.fill = state.speakReplies ? '#c084fc' : '#64748b';
+    }
+  }
+  updateSpeakerIcon();
+
+  // --- Custom API Key input ---
+  if (settingCustomKey) {
+    settingCustomKey.value = state.customApiKey;
+    settingCustomKey.addEventListener('change', (e) => {
+      state.customApiKey = e.target.value.trim();
+      localStorage.setItem('ai_buddy_custom_key', state.customApiKey);
+      showBanner('Custom OpenAI API Key saved for this session!');
+    });
+  }
+
+  // --- Send Message Flow ---
+  async function handleSendMessage(text) {
+    text = (text || '').trim();
+    if (!text || state.busy) return;
+
+    stopSpeaking();
+    state.busy = true;
+    if (sendBtn) sendBtn.disabled = true;
+    if (inputEl) inputEl.value = '';
+
+    // Append to messages & DOM
+    const userMsg = { role: 'user', content: text, time: getCurrentTimeStr() };
+    state.messages.push(userMsg);
+    appendMessageElement('user', text);
+
+    const typingEl = addTypingIndicator();
+
+    try {
+      const headers = { 'Content-Type': 'application/json' };
+      if (state.customApiKey) {
+        headers['x-openai-key'] = state.customApiKey;
+      }
+
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ messages: state.messages })
+      });
+
+      const data = await res.json().catch(() => ({}));
+      typingEl.remove();
+
+      if (!res.ok && !data.reply) {
+        throw new Error(data.error || 'Server error.');
+      }
+
+      const reply = data.reply || "I'm here to help!";
+      const assistantMsg = { role: 'assistant', content: reply, time: getCurrentTimeStr() };
+      state.messages.push(assistantMsg);
+      appendMessageElement('assistant', reply);
+
+      // Save to chat history
+      updateSessionInHistory(text, reply);
+
+      // Speak aloud if enabled
+      if (state.speakReplies) {
+        speak(reply);
+      }
+    } catch (err) {
+      typingEl.remove();
+      appendMessageElement('error', `Assistant notice: ${err.message}`);
+    } finally {
+      state.busy = false;
+      if (sendBtn) sendBtn.disabled = false;
+      if (inputEl) inputEl.focus();
+    }
+  }
+
+  function getCurrentTimeStr() {
+    const d = new Date();
+    return `${d.getHours()}:${d.getMinutes() < 10 ? '0' : ''}${d.getMinutes()}`;
+  }
+
+  function updateSessionInHistory(userQuery, assistantReply) {
+    let session = chatHistory.find(s => s.id === state.activeSessionId);
+    if (!session) {
+      session = {
+        id: state.activeSessionId || ('session-' + Date.now()),
+        title: userQuery.slice(0, 24) + (userQuery.length > 24 ? '...' : ''),
+        type: 'chatgpt',
+        time: getCurrentTimeStr(),
+        preview: assistantReply.slice(0, 50) + '...',
+        messages: state.messages
+      };
+      chatHistory.unshift(session);
+    } else {
+      session.time = getCurrentTimeStr();
+      session.preview = assistantReply.slice(0, 50) + '...';
+      session.messages = state.messages;
+    }
+    saveHistory();
+    renderHistory();
+  }
+
+  if (inputForm) {
+    inputForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      handleSendMessage(inputEl.value);
+    });
+  }
+
+  // --- Voice Input Speech Recognition ---
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let recognition = null;
+  let isListening = false;
+  let manualStop = false;
+  let transcribedText = '';
+
+  if (SR) {
+    recognition = new SR();
+    recognition.lang = 'en-US';
+    recognition.interimResults = true;
+    recognition.maxAlternatives = 1;
+
+    recognition.onstart = () => {
+      isListening = true;
+      manualStop = false;
+      transcribedText = '';
+      if (micBtn) {
+        micBtn.classList.add('listening');
+        micBtn.title = 'Listening... tap to send';
+      }
+      if (islandEq) islandEq.classList.remove('hidden');
+      if (voiceOverlayStatus) voiceOverlayStatus.textContent = 'Listening...';
+    };
+
+    recognition.onresult = (e) => {
+      let interim = '';
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        if (e.results[i].isFinal) transcribedText += e.results[i][0].transcript;
+        else interim += e.results[i][0].transcript;
+      }
+      const full = (transcribedText + interim).trimStart();
+      if (inputEl) inputEl.value = full;
+      if (voiceOverlayTranscript) voiceOverlayTranscript.textContent = full || 'Listening to your voice...';
+    };
+
+    recognition.onerror = (e) => {
+      console.warn('Speech recognition error:', e.error);
+      if (voiceOverlayStatus) voiceOverlayStatus.textContent = 'Microphone paused';
+    };
+
+    recognition.onend = () => {
+      isListening = false;
+      if (micBtn) {
+        micBtn.classList.remove('listening');
+        micBtn.title = 'Speak message';
+      }
+      if (islandEq) islandEq.classList.add('hidden');
+
+      if (!manualStop) {
+        const textToSend = (transcribedText || (inputEl && inputEl.value) || '').trim();
+        if (textToSend) {
+          if (voiceTalkOverlay) voiceTalkOverlay.classList.add('hidden');
+          handleSendMessage(textToSend);
+        }
+      }
+    };
+
+    function startListening() {
+      stopSpeaking();
+      try {
+        recognition.start();
+      } catch (err) { }
+    }
+
+    function stopListening() {
+      manualStop = true;
+      if (recognition && isListening) {
+        recognition.stop();
+      }
+    }
+
+    if (micBtn) {
+      micBtn.addEventListener('click', () => {
+        if (isListening) {
+          stopListening();
+        } else {
+          startListening();
+        }
+      });
+    }
+
+    // "Talk with Bot" Action Card
+    if (cardTalkBot) {
+      cardTalkBot.addEventListener('click', () => {
+        switchTab('chat');
+        if (voiceTalkOverlay) voiceTalkOverlay.classList.remove('hidden');
+        if (voiceOverlayStatus) voiceOverlayStatus.textContent = 'Listening...';
+        if (voiceOverlayTranscript) voiceOverlayTranscript.textContent = 'Say anything to your Personal AI Buddy!';
+        startListening();
+      });
+    }
+
+    if (closeVoiceOverlayBtn) {
+      closeVoiceOverlayBtn.addEventListener('click', () => {
+        stopListening();
+        if (voiceTalkOverlay) voiceTalkOverlay.classList.add('hidden');
+      });
+    }
+
+    if (btnVoiceOverlayStop) {
+      btnVoiceOverlayStop.addEventListener('click', () => {
+        stopListening();
+        if (voiceTalkOverlay) voiceTalkOverlay.classList.add('hidden');
+      });
+    }
+
+  } else {
+    if (micBtn) {
+      micBtn.title = 'Speech Recognition requires Chrome, Edge, or Safari.';
+    }
+    if (cardTalkBot) {
+      cardTalkBot.addEventListener('click', () => {
+        switchTab('chat');
+      });
+    }
+  }
+
+  // "Chat with Bot" Action Card
+  if (cardChatBot) {
+    cardChatBot.addEventListener('click', () => {
+      switchTab('chat');
+    });
+  }
+
+  // "Search by Image / Prompt Ideas" Action Card
+  if (cardPromptBot) {
+    cardPromptBot.addEventListener('click', () => {
+      const samplePrompts = [
+        "How can I improve my programming skills?",
+        "Suggest a clean mobile app design with dark purple theme.",
+        "Give me 3 creative coding project ideas.",
+        "Explain how voice AI works in simple terms."
+      ];
+      const randomPrompt = samplePrompts[Math.floor(Math.random() * samplePrompts.length)];
+      switchTab('chat');
+      if (inputEl) {
+        inputEl.value = randomPrompt;
+        inputEl.focus();
+      }
+    });
+  }
+
+  if (historySeeAllBtn) {
+    historySeeAllBtn.addEventListener('click', () => {
+      switchTab('chat');
+    });
+  }
+
+  // --- Voice Studio: Fetch & Populate ElevenLabs Voices ---
+  async function loadVoices() {
+    try {
+      const res = await fetch('/api/voices');
+      if (!res.ok) throw new Error('Voices endpoint returned ' + res.status);
+      const data = await res.json();
+      state.voices = data.voices || [];
+
+      if (elevenlabsStatusIndicator) {
+        elevenlabsStatusIndicator.textContent = `Ready (${state.voices.length} Voices Active)`;
+        elevenlabsStatusIndicator.className = 'status-state state-active';
+      }
+
+      populateVoiceDropdown();
+      renderVoicesStudio();
+    } catch (err) {
+      console.warn('Could not load ElevenLabs voices:', err);
+      if (elevenlabsStatusIndicator) {
+        elevenlabsStatusIndicator.textContent = 'Voice API (Key verification pending)';
+        elevenlabsStatusIndicator.className = 'status-state state-fallback';
+      }
+    }
+  }
+
+  function populateVoiceDropdown() {
+    if (!voiceSelectDropdown) return;
+    voiceSelectDropdown.innerHTML = '';
+
+    state.voices.forEach(v => {
+      const opt = document.createElement('option');
+      opt.value = v.id;
+      opt.textContent = v.name;
+      if (v.id === state.selectedVoiceId) opt.selected = true;
+      voiceSelectDropdown.appendChild(opt);
+    });
+
+    voiceSelectDropdown.addEventListener('change', (e) => {
+      selectVoice(e.target.value);
+    });
+  }
+
+  function selectVoice(voiceId) {
+    const found = state.voices.find(v => v.id === voiceId);
+    state.selectedVoiceId = voiceId;
+    state.selectedVoiceName = found ? found.name.split(' - ')[0] : 'Assistant';
+    localStorage.setItem('ai_buddy_voice_id', state.selectedVoiceId);
+    localStorage.setItem('ai_buddy_voice_name', state.selectedVoiceName);
+
+    if (activeVoiceName) activeVoiceName.textContent = `Voice: ${state.selectedVoiceName}`;
+    if (chatVoiceLabel) chatVoiceLabel.textContent = state.selectedVoiceName;
+    if (voiceSelectDropdown) voiceSelectDropdown.value = voiceId;
+
+    renderVoicesStudio();
+  }
+
+  function renderVoicesStudio() {
+    if (!voicesCardsContainer) return;
+    voicesCardsContainer.innerHTML = '';
+
+    state.voices.forEach(v => {
+      const parts = v.name.split(' - ');
+      const name = parts[0] || v.name;
+      const desc = parts[1] || 'Natural AI Voice';
+      const isSelected = v.id === state.selectedVoiceId;
+
+      const card = document.createElement('div');
+      card.className = `voice-card-item ${isSelected ? 'selected' : ''}`;
+      card.innerHTML = `
+        <div class="voice-card-left">
+          <div class="voice-badge-icon">🎙️</div>
+          <div>
+            <div class="voice-item-name">${name}</div>
+            <div class="voice-item-tags">${desc}</div>
+          </div>
+        </div>
+        <button type="button" class="voice-test-btn" data-voice-id="${v.id}">
+          ${isSelected ? 'Selected' : 'Use Voice'}
+        </button>
+      `;
+
+      card.addEventListener('click', () => {
+        selectVoice(v.id);
+        speak(`Hi ${state.userName}! I am ${name}.`);
+      });
+
+      voicesCardsContainer.appendChild(card);
+    });
+  }
+
+  // --- Check Backend Configuration Status ---
+  fetch('/api/config')
+    .then(r => r.json())
+    .then(cfg => {
+      if (openaiStatusIndicator) {
+        if (cfg.openaiConfigured) {
+          openaiStatusIndicator.textContent = 'Configured (Smart Engine)';
+          openaiStatusIndicator.className = 'status-state state-active';
+        } else {
+          openaiStatusIndicator.textContent = 'Smart Offline Buddy Mode';
+          openaiStatusIndicator.className = 'status-state state-fallback';
+        }
+      }
+    })
+    .catch(() => { });
+
+  // --- Initial Setup ---
+  loadVoices();
+  renderHistory();
+
+  // Load first session or starter greeting
+  if (chatHistory.length > 0) {
+    loadSession(chatHistory[0]);
+  } else {
+    startNewChat();
+  }
+
+  switchTab('home');
+})();
