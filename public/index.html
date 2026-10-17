@@ -14,6 +14,11 @@
     href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap"
     rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
+  <script>
+    if (!sessionStorage.getItem('ai_buddy_logged_in') && !window.location.search.includes('bypass')) {
+      window.location.replace('Welcomepage.html');
+    }
+  </script>
 </head>
 
 <body class="desktop-mode">
@@ -82,6 +87,15 @@
             alt="Sakib Profile" class="avatar-img" id="user-avatar-img" />
           <span class="user-greeting-name">Sakib</span>
         </div>
+
+        <button type="button" class="topbar-logout-btn" id="topbar-logout-btn" title="Log out to Welcome Page">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+          <span>Logout</span>
+        </button>
       </div>
     </header>
 
@@ -163,6 +177,14 @@
               <span class="user-sub">Free Plan</span>
             </div>
           </div>
+          <button type="button" class="sidebar-logout-btn" id="sidebar-logout-btn" title="Log out to Welcome Page">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <polyline points="16 17 21 12 16 7"></polyline>
+              <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+            <span>Log out</span>
+          </button>
         </div>
       </aside>
 
@@ -594,6 +616,18 @@
                 <input type="password" id="setting-custom-key" placeholder="sk-..." class="custom-input" />
                 <div class="input-helper">If you have a fresh key with credits, paste it here to use directly.</div>
               </div>
+            </div>
+
+            <div class="settings-group">
+              <div class="settings-group-title">Session</div>
+              <button type="button" class="settings-logout-btn" id="settings-logout-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                  <polyline points="16 17 21 12 16 7"></polyline>
+                  <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+                <span>Log out to Welcome Page</span>
+              </button>
             </div>
 
             <div class="settings-group">

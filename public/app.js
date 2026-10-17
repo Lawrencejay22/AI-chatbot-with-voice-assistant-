@@ -256,9 +256,24 @@
 
   if (openWelcomeBtn) {
     openWelcomeBtn.addEventListener('click', () => {
-      welcomeScreen.classList.add('active');
+      window.location.href = 'Welcomepage.html';
     });
   }
+
+  // --- Logout Handlers (Redirect back to Welcome Page) ---
+  function handleLogout() {
+    stopSpeaking();
+    sessionStorage.removeItem('ai_buddy_logged_in');
+    window.location.href = 'Welcomepage.html';
+  }
+
+  const topbarLogoutBtn = document.getElementById('topbar-logout-btn');
+  const sidebarLogoutBtn = document.getElementById('sidebar-logout-btn');
+  const settingsLogoutBtn = document.getElementById('settings-logout-btn');
+
+  [topbarLogoutBtn, sidebarLogoutBtn, settingsLogoutBtn].forEach(btn => {
+    if (btn) btn.addEventListener('click', handleLogout);
+  });
 
   // --- Render History Lists ---
   function renderHistory() {
