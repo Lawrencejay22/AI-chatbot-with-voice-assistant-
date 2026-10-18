@@ -21,9 +21,13 @@ const ELEVENLABS_KEY = process.env.ELEVENLABS_API_KEY;
 const OPENAI_KEY = process.env.OPENAI_API_KEY;
 
 const SYSTEM_PROMPT = [
-  'You are a friendly, concise voice assistant.',
-  'Your replies are spoken aloud with text-to-speech, so keep them short and conversational, usually 1-3 sentences.',
-  'Never use markdown, bullet points, or special symbols.'
+  'You are a friendly, conversational voice assistant and culinary companion.',
+  'Your replies are spoken aloud with text-to-speech, so keep them natural, engaging, and spoken-friendly.',
+  'Never use markdown, bullet point characters, or special symbols.',
+  'When asked for recipes, food recommendations, desserts, or drinks (like adobo, sinigang, cakes, pastries, or cocktails):',
+  'First, explain what the food or drink is, its flavor profile, and appeal.',
+  'Second, walk through the step-by-step cooking or preparation process conversationally.',
+  'Third, conclude with the key ingredients and measurements required.'
 ].join(' ');
 
 app.get('/api/config', (req, res) => {
@@ -33,11 +37,26 @@ app.get('/api/config', (req, res) => {
 function generateSmartFallback(messages) {
   const lastMsg = (messages[messages.length - 1]?.content || '').toLowerCase();
   
+  if (/adobo/.test(lastMsg)) {
+    return "Chicken or pork adobo is the quintessential Filipino comfort dish, featuring savory, tangy, and rich garlic-soy flavors with a hint of black pepper and bay leaves. To cook it, first sear your chicken or pork in a hot pan until golden, sauté minced garlic and onions, pour in soy sauce, vinegar, water, and whole peppercorns with bay leaves, then simmer gently for 30 to 40 minutes until tender and slightly reduced. Finally, the key ingredients you need are one kilogram of meat, half a cup of soy sauce, one-third cup of cane vinegar, a head of crushed garlic, two bay leaves, black peppercorns, and a spoonful of cooking oil.";
+  }
+  if (/sinigang/.test(lastMsg)) {
+    return "Sinigang is a famous Filipino sour soup celebrated for its mouthwatering tamarind broth loaded with tender pork or shrimp and fresh greens. To cook it, boil your pork ribs in water with chopped onions and tomatoes until tender, stir in tamarind soup base or fresh sampaloc, then add radish, eggplant, long green chilies, and finish with water spinach kangkong for the last two minutes of simmering. For the ingredients, you will need pork ribs, fresh tomatoes, red onion, tamarind broth mix, daikon radish, string beans, kangkong, green finger chilies, and fish sauce to taste.";
+  }
+  if (/cake|bake|pastry|dessert|sweet/.test(lastMsg)) {
+    return "A moist chocolate sponge cake is a classic sweet dessert with a rich cocoa aroma and tender crumb. To make it, whisk together your flour, sugar, and cocoa powder in a bowl, mix in eggs, milk, melted butter, and vanilla extract until smooth, pour into a greased baking pan, and bake at 350 degrees Fahrenheit or 175 Celsius for about 30 to 35 minutes until a toothpick comes out clean. For the ingredients, gather two cups of all-purpose flour, two cups of sugar, three-quarters cup of cocoa powder, two eggs, one cup of milk, half a cup of melted butter, two teaspoons of baking powder, and a splash of vanilla.";
+  }
+  if (/drink|beverage|cocktail|smoothie|coffee|tea|juice/.test(lastMsg)) {
+    return "A refreshing mango calamansi cooler is a tropical beverage that balances sweet mango puree with citrusy calamansi zest over crushed ice. To prepare it, blend fresh ripe mango cheeks until smooth, stir in fresh calamansi juice and honey or simple syrup, pour into a tall glass filled with ice, and top with sparkling soda water. You will need two ripe mangoes, three tablespoons of calamansi or lime juice, two tablespoons of honey, crushed ice, and one cup of sparkling water.";
+  }
+  if (/recipe|cook|food|dish|dinner|lunch|breakfast/.test(lastMsg)) {
+    return "I would love to help you cook! I can guide you through classic savory dishes like Adobo and Sinigang, delicious baked cakes, desserts, or refreshing beverages. Just tell me what you feel like making, and I will explain the dish, give you step-by-step cooking directions, and list the exact ingredients!";
+  }
   if (/hello|hi|hey|greetings|morning|evening|afternoon/.test(lastMsg)) {
     const greetings = [
-      "Hello! I am your AI voice buddy. How can I assist you with your day today?",
-      "Hi there! Great to hear from you. What would you like to explore or talk about?",
-      "Hey! I'm ready to help you with code, answers, or creative ideas. What's on your mind?"
+      "Hello! I am your AI voice buddy and cooking companion. How can I assist you with your day or your kitchen recipes today?",
+      "Hi there! Great to hear from you. What would you like to explore, cook, or talk about?",
+      "Hey! I'm ready to help you with recipes, code, answers, or creative ideas. What's on your mind?"
     ];
     return greetings[Math.floor(Math.random() * greetings.length)];
   }
@@ -45,7 +64,7 @@ function generateSmartFallback(messages) {
     return "The best way to improve your programming skills is building hands-on projects, practicing algorithms, and reading documentation daily. Start with small features and scale up!";
   }
   if (/who are you|what are you|what can you do|about you/.test(lastMsg)) {
-    return "I am your Personal AI Buddy! I can converse with you, provide programming guidance, answer questions, and speak replies out loud using high quality voice synthesis.";
+    return "I am your Personal AI Buddy! I can converse with you, guide you step-by-step through cooking delicious dishes, answer questions, and speak replies out loud using high quality voice synthesis.";
   }
   if (/weather|forecast|rain|temperature/.test(lastMsg)) {
     return "I don't have access to live GPS sensor data right now, but you can check your local weather app or let me know what city you're curious about!";
