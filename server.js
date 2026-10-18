@@ -21,26 +21,28 @@ const ELEVENLABS_KEY = process.env.ELEVENLABS_API_KEY;
 const OPENAI_KEY = process.env.OPENAI_API_KEY;
 
 const SYSTEM_PROMPT = [
-  'You are Buddy, a friendly, intelligent voice companion specializing in study mentoring, programming guidance, and culinary recipes.',
+  'You are Buddy, a friendly, intelligent voice companion specializing in academic study mentoring, programming guidance, and culinary recipes.',
   'Your replies will be displayed visually in an interactive chat bubble and spoken aloud via text-to-speech.',
   '',
-  'When helping with CODING and PROGRAMMING (e.g., JavaScript, Python, HTML/CSS, bugs, algorithms):',
-  '1. Headline & Concept: Explain the concept, logic, or bug clearly in 1-2 friendly sentences.',
-  '2. Code Example: Provide a clean, copy-ready snippet in markdown code blocks (```language). Keep snippets concise and readable.',
-  '3. Step-by-Step Breakdown: Walk through how the code works using numbered steps (1., 2., 3.).',
-  '4. Pro Tip: Conclude with a helpful best practice or gotcha to avoid.',
+  'CRITICAL DEPTH INSTRUCTION: Always provide thorough, well-developed, and complete answers! Never cut explanations short with rushed 1-2 sentence summaries. Treat every study subject (Math, Biology, Chemistry, History, Physics, Literature) and Coding question with depth, clear structure, and high educational value.',
   '',
-  'When helping with STUDYING, EXAM PREPARATION, or LEARNING CONCEPTS:',
-  '1. Core Idea: Explain the topic simply using intuitive analogies or the Feynman Technique.',
-  '2. Study Action Plan: Provide 3-4 structured, actionable study steps (1., 2., 3., 4.) using Active Recall or Spaced Repetition.',
-  '3. Key Takeaways: Conclude with clean bullet points (•) for quick memory review before exams.',
+  'When helping with STUDYING (Math, Biology, Chemistry, History, Science, Exam Prep):',
+  '1. Comprehensive Concept & Context: Thoroughly define the concept, theory, formula, or historical event with clear intuitive explanations and real-world relevance.',
+  '2. Step-by-Step Breakdown or Problem Solving: Walk through the steps, proofs, biological mechanisms, chemical reactions, or historical timeline using numbered steps (1., 2., 3., 4.). For Math and Chemistry, show step-by-step problem-solving with concrete examples.',
+  '3. Key Exam Takeaways & Memory Cues: Conclude with high-yield bullet points (•) summarizing key definitions, formulas, or dates to remember.',
+  '',
+  'When helping with CODING and PROGRAMMING (JavaScript, Python, Web Dev, Algorithms, Debugging):',
+  '1. Concept & Architecture: Thoroughly explain the technology, design pattern, logic, or bug.',
+  '2. Complete Code Example: Provide clean, working, copy-ready code enclosed in markdown code blocks with language tags (```javascript, ```python, etc.). Include helpful comments.',
+  '3. Step-by-Step Breakdown: Walk through how the code works line-by-line using numbered steps (1., 2., 3., 4.).',
+  '4. Pro Tip & Best Practice: Conclude with performance tips, clean-code advice, or common pitfalls to avoid.',
   '',
   'When answering RECIPES and FOOD/DRINK requests (e.g., Adobo, Sinigang, Cakes, Drinks):',
-  '1. Food Overview: Explain what the dish is and its flavor profile.',
-  '2. Step-by-Step Cooking: Walk through instructions using numbered steps (1., 2., 3.).',
-  '3. Ingredients Checklist: Conclude with key ingredients using bullet points (•).',
+  '1. Food Overview: Explain what the dish is, cultural background, and flavor profile.',
+  '2. Step-by-Step Cooking: Walk through clear sequential cooking instructions using numbered steps (1., 2., 3., 4.).',
+  '3. Ingredients Checklist: Conclude with key ingredients and measurements using bullet points (•).',
   '',
-  'Keep spoken explanations natural, encouraging, and clear without unnecessary symbols.'
+  'Keep formatting visually beautiful with clear line breaks and headers.'
 ].join('\n');
 
 app.get('/api/config', (req, res) => {
@@ -141,12 +143,105 @@ function generateSmartFallback(messages) {
   }
   if (/hello|hi|hey|greetings|morning|evening|afternoon/.test(lastMsg)) {
     const greetings = [
-      "Hello! I am your AI voice buddy and cooking companion. How can I assist you with your day or your kitchen recipes today?",
-      "Hi there! Great to hear from you. What would you like to explore, cook, or talk about?",
-      "Hey! I'm ready to help you with recipes, code, answers, or creative ideas. What's on your mind?"
+      "Hello! I am your AI voice buddy, study coach, and programming companion. How can I assist you with math, science, history, coding, or your day today?",
+      "Hi there! Great to hear from you. What subject, coding problem, or creative idea would you like to explore together?",
+      "Hey! I'm ready to help you with detailed study lessons, coding roadmaps, answers, or creative projects. What's on your mind?"
     ];
     return greetings[Math.floor(Math.random() * greetings.length)];
   }
+
+  // --- ACADEMIC STUDY FALLBACKS ---
+  if (/math|calculus|algebra|geometry|quadratic|derivative|integral|equation|formula/.test(lastMsg)) {
+    return [
+      "📐 Mathematics Mastery: Solving Quadratic Equations",
+      "A quadratic equation is a second-degree polynomial equation expressed in standard form as: ax² + bx + c = 0 (where 'a' is nonzero). Mastering quadratics is fundamental for high school and university mathematics, physics projectile motion, and algorithm complexity.",
+      "",
+      "⚡ 4-Step Solution Protocol (Step-by-Step):",
+      "1. Standard Form Alignment: Rearrange the equation so all terms equal zero. Example: x² - 5x + 6 = 0. Identify coefficients: a = 1, b = -5, c = 6.",
+      "2. Calculate the Discriminant: Evaluate D = b² - 4ac. Here: D = (-5)² - 4(1)(6) = 25 - 24 = 1. Because D > 0, the equation yields two distinct real solutions.",
+      "3. Apply the Quadratic Formula: Formula: x = (-b ± √D) / (2a). Substituting values: x = (5 ± √1) / (2 × 1) = (5 ± 1) / 2.",
+      "4. Final Roots Evaluation: First root: x = (5 + 1)/2 = 3. Second root: x = (5 - 1)/2 = 2. Therefore, roots are x = 2 and x = 3.",
+      "",
+      "💡 High-Yield Math Exam Takeaways:",
+      "• Discriminant > 0: Two distinct real roots (parabola crosses x-axis twice)",
+      "• Discriminant = 0: Exactly one repeated real root (parabola vertex touches x-axis)",
+      "• Discriminant < 0: Two complex conjugate roots involving imaginary unit i",
+      "• Quick Factoring Check: Look for factors of 'c' that add up to 'b' to solve faster without the full formula"
+    ].join('\n');
+  }
+
+  if (/biology|cell|photosynthesis|mitosis|genetics|dna|organism/.test(lastMsg)) {
+    return [
+      "🧬 Biology Deep-Dive: Photosynthesis & Cellular Energy",
+      "Photosynthesis is the vital biological biochemical pathway through which autotrophic organisms (plants, algae, and cyanobacteria) capture light energy to synthesize energy-rich glucose from carbon dioxide and water, releasing oxygen as a byproduct.",
+      "",
+      "🔬 The 4 Stages of the Photosynthetic Pathway:",
+      "1. Light Absorption: Solar photons strike chlorophyll pigments embedded inside thylakoid membranes within plant chloroplasts, elevating electrons to high energy states.",
+      "2. Photolysis of Water: Enzyme clusters split H₂O molecules into oxygen gas (O₂), protons (H⁺), and replacement electrons. Oxygen diffuses out into the atmosphere.",
+      "3. ATP & NADPH Photophosphorylation: Energized electrons travel along the electron transport chain, pumping protons into the thylakoid lumen and fueling ATP Synthase to generate ATP and NADPH.",
+      "4. The Calvin Cycle (Dark Phase): In the stroma, RuBisCO enzyme fixes atmospheric CO₂ into 3-PGA, utilizing ATP and NADPH to manufacture G3P molecules, which assemble into glucose (C₆H₁₂O₆).",
+      "",
+      "💡 High-Yield Biology Exam Takeaways:",
+      "• Balanced Chemical Equation: 6CO₂ + 6H₂O + Solar Energy → C₆H₁₂O₆ + 6O₂",
+      "• Site of Light Reactions: Thylakoid membrane / Grana",
+      "• Site of Calvin Cycle: Fluid-filled Stroma of chloroplast",
+      "• Major Rate-Limiting Factors: Light intensity, CO₂ concentration, and optimal enzyme temperature"
+    ].join('\n');
+  }
+
+  if (/chemistry|chemical|atom|periodic|reaction|acid|base|bonding|molecule/.test(lastMsg)) {
+    return [
+      "🧪 Chemistry Mastery: Chemical Bonding & Molecular Interactions",
+      "Chemical bonding represents the electrostatic attractive forces holding atoms and ions together to achieve stable, low-energy valence electron octets. The 3 primary bond classifications dictate chemical and physical material properties.",
+      "",
+      "⚗️ 4 Types of Chemical Bonds & Forces (Step-by-Step):",
+      "1. Ionic Bonds (Electron Transfer): Formed between metals and nonmetals with large electronegativity gaps (ΔEN > 1.7). Metals lose electrons to form positive cations, while nonmetals gain electrons to form negative anions, creating crystalline lattice solids with high melting points (e.g., NaCl).",
+      "2. Covalent Bonds (Electron Sharing): Formed between nonmetals with comparable electronegativities. Nonpolar covalent bonds share electrons symmetrically (e.g., O₂, CH₄). Polar covalent bonds exhibit unequal electron distribution, producing permanent dipole moments (e.g., H₂O).",
+      "3. Metallic Bonds (Delocalized Electron Sea): In bulk elemental metals, valence electrons decouple from atomic cores into a flowing electron cloud, enabling high thermal/electrical conductivity, ductility, and metallic luster.",
+      "4. Hydrogen Bonding: Exceptionally strong intermolecular attraction occurring when hydrogen bonds to highly electronegative nitrogen, oxygen, or fluorine (N, O, F), conferring water with anomalously high boiling points and surface tension.",
+      "",
+      "💡 High-Yield Chemistry Exam Takeaways:",
+      "• The Octet Rule: Atoms share, gain, or lose electrons to match noble gas electron configurations (8 valence electrons)",
+      "• Periodic Trends: Electronegativity increases up and to the right of the periodic table (Fluorine is highest at 4.0)",
+      "• Strong Acids Checklist: HCl, HBr, HI, HNO₃, H₂SO₄, and HClO₄ dissociate completely in aqueous solutions"
+    ].join('\n');
+  }
+
+  if (/history|war|revolution|ancient|civilization|empire|century/.test(lastMsg)) {
+    return [
+      "🏛️ World History Analysis: The Catalysts & Consequences of World War I",
+      "World War I (1914–1918) was a defining global geopolitical conflict that ended four major empires (Russian, German, Austro-Hungarian, and Ottoman) and reshaped 20th-century borders. Decades of structural tensions culminated in total industrial warfare.",
+      "",
+      "📜 The M-A-I-N Framework & Timeline (Step-by-Step):",
+      "1. Militarism: Imperial European powers engaged in aggressive arms races—most critically the Anglo-German naval race—expanding standing armies and modern arsenals.",
+      "2. Alliances: Mutual defense treaties divided Europe into two rigid blocs: the Triple Entente (Britain, France, Russia) and the Central Powers (Germany, Austria-Hungary, Italy). A spark on one nation triggered automatic military mobilization.",
+      "3. Imperialism: Fierce economic and colonial rivalry across Africa and Asia generated recurring diplomatic standoffs between rival European dynasties.",
+      "4. Nationalism & The Spark: Slavic nationalist movements in the Balkans peaked on June 28, 1914, when Bosnian Serb Gavrilo Princip assassinated Austro-Hungarian Archduke Franz Ferdinand in Sarajevo, triggering the July Crisis and rapid continental war mobilization.",
+      "",
+      "💡 High-Yield History Exam Takeaways:",
+      "• Warfare Revolution: Introduction of machine guns, chlorine/mustard poison gas, tanks, aviation combat, and subterranean trench warfare",
+      "• Turning Points: Russian Revolution of 1917 (Russia exits the war) and the entry of the United States in April 1917 tipping the balance for the Allies",
+      "• Treaty of Versailles (1919): Imposed massive territorial losses and Article 231 'War Guilt Clause' on Germany, which paved the psychological and economic path to World War II"
+    ].join('\n');
+  }
+
+  if (/physics|newton|gravity|force|energy|thermodynamics|velocity/.test(lastMsg)) {
+    return [
+      "⚡ Classical Physics: Newton's Laws of Motion & Conservation Principles",
+      "Formulated by Sir Isaac Newton in 1687, the three laws of motion established classical mechanics, mathematically linking the forces acting on a body to its resulting trajectory across time and space.",
+      "",
+      "🚀 The 3 Laws of Motion (Step-by-Step Breakdown):",
+      "1. First Law (Law of Inertia): An object continues in a state of rest or uniform rectilinear motion at constant velocity unless acted upon by a net external force. Inertia is quantified directly by inertial mass.",
+      "2. Second Law (F_net = ma): The net force acting upon an object equals the rate of change of its linear momentum. For constant mass: Net Force (Newtons) = Mass (kg) × Acceleration (m/s²). Direction of acceleration matches the net force vector.",
+      "3. Third Law (Action-Reaction Pairs): When Body A exerts a force on Body B, Body B simultaneously exerts an equal magnitude force in the opposite direction on Body A. These forces never cancel out because they act on distinct bodies.",
+      "",
+      "💡 High-Yield Physics Exam Takeaways:",
+      "• Mass vs. Weight: Mass is constant matter quantity (kg); Weight is downward gravitational force W = mg (Newtons, where g ≈ 9.8 m/s² on Earth)",
+      "• Conservation of Momentum: Total momentum before any collision equals total momentum after in isolated systems: m₁u₁ + m₂u₂ = m₁v₁ + m₂v₂",
+      "• Work-Energy Theorem: Total net work done on an object equals its change in kinetic energy: W_net = ΔKE = ½mv²_final - ½mv²_initial"
+    ].join('\n');
+  }
+
   if (/study|exam|learn|memorize|revision|homework|technique|pomodoro|feynman/.test(lastMsg)) {
     return [
       "📚 High-Performance Study Method: Active Recall & Pomodoro",

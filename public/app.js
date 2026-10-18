@@ -371,9 +371,10 @@
       saveHistory();
       renderHistory();
     }
-    // Delete conversation silently without sounding
+    // Reset conversation and navigate back to the main dashboard
     startNewChat(false);
-    showBanner('Conversation deleted.');
+    switchTab('home');
+    showBanner('Conversation deleted. Returned to Dashboard.');
     setTimeout(() => {
       if (banner) banner.classList.add('hidden');
     }, 2000);
@@ -924,7 +925,9 @@
   // "Chat with Bot" Action Card
   if (cardChatBot) {
     cardChatBot.addEventListener('click', () => {
+      startNewChat(true); // Starts a fresh chat & sounds greeting aloud
       switchTab('chat');
+      if (inputEl) inputEl.focus();
     });
   }
 
@@ -932,12 +935,15 @@
   if (cardPromptBot) {
     cardPromptBot.addEventListener('click', () => {
       const samplePrompts = [
-        "How can I improve my programming skills?",
-        "Suggest a clean mobile app design with dark purple theme.",
-        "Give me 3 creative coding project ideas.",
-        "Explain how voice AI works in simple terms."
+        "Explain photosynthesis in Biology step-by-step.",
+        "How do I solve quadratic equations in Math?",
+        "Explain chemical bonding in Chemistry with examples.",
+        "How do arrays and arrow functions work in JavaScript?",
+        "What caused World War I in History?",
+        "How can I improve my study habits using Active Recall?"
       ];
       const randomPrompt = samplePrompts[Math.floor(Math.random() * samplePrompts.length)];
+      startNewChat(true); // Starts a fresh chat & sounds greeting aloud
       switchTab('chat');
       if (inputEl) {
         inputEl.value = randomPrompt;
