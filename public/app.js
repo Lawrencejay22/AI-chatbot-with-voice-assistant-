@@ -18,8 +18,22 @@
   const speakStatus = document.getElementById('speak-status');
   const banner = document.getElementById('banner');
 
+  const DEFAULT_VOICES = [
+    { id: 'EXAVITQu4vr4xnSDxMaL', name: 'Sarah - Mature, Reassuring, Confident' },
+    { id: 'FGY2WhTYpPnrIDTdsKH5', name: 'Laura - Enthusiast, Quirky Attitude' },
+    { id: 'IKne3meq5aSn9XLyUdCD', name: 'Charlie - Deep, Confident, Energetic' },
+    { id: 'JBFqnCBsd6RMkjVDRZzb', name: 'George - Warm, Captivating Storyteller' },
+    { id: 'SAz9YHcvj6GT2YYXdXww', name: 'River - Relaxed, Neutral, Informative' },
+    { id: 'TX3LPaxmHKxFdv7VOQHJ', name: 'Liam - Energetic, Social Media Creator' },
+    { id: 'Xb7hH8MSUJpSbSDYk0k2', name: 'Alice - Clear, Engaging Educator' },
+    { id: 'iP95p4xoKVk53GoZ742B', name: 'Chris - Charming, Down-to-Earth' },
+    { id: 'pFZP5JQG7iQjIQuC4Bku', name: 'Lily - Velvety Actress' },
+    { id: 'onwK4e9ZLuTAKqWW03F9', name: 'Daniel - Steady Broadcaster' }
+  ];
+
   const voiceSelectDropdown = document.getElementById('voice-select-dropdown');
   const activeVoiceName = document.getElementById('active-voice-name');
+  const activeVoiceBadge = document.getElementById('active-voice-badge');
   const chatVoiceLabel = document.getElementById('chat-voice-label');
   const voicesCardsContainer = document.getElementById('voices-cards-container');
 
@@ -76,7 +90,7 @@
     messages: [],
     busy: false,
     currentAudio: null,
-    voices: []
+    voices: [...DEFAULT_VOICES]
   };
 
   // Seed default history items matching user's design image
@@ -969,12 +983,30 @@
   }
 
   // --- Voice Studio: Fetch & Populate ElevenLabs Voices ---
+  function updateVoiceUI() {
+    const currentName = state.selectedVoiceName || 'Sarah';
+    if (activeVoiceName) {
+      activeVoiceName.textContent = `Voice: ${currentName}`;
+    }
+    if (chatVoiceLabel) {
+      chatVoiceLabel.textContent = currentName;
+    }
+    if (voiceSelectDropdown && state.selectedVoiceId) {
+      voiceSelectDropdown.value = state.selectedVoiceId;
+    }
+    if (activeVoiceBadge) {
+      activeVoiceBadge.setAttribute('title', `Active Voice: ${currentName}. Click to toggle voice.`);
+    }
+  }
+
   async function loadVoices() {
     try {
       const res = await fetch('/api/voices');
       if (!res.ok) throw new Error('Voices endpoint returned ' + res.status);
       const data = await res.json();
-      state.voices = data.voices || [];
+      if (Array.isArray(data.voices) && data.voices.length > 0) {
+        state.voices = data.voices;
+      }
 
       if (elevenlabsStatusIndicator) {
         elevenlabsStatusIndicator.textContent = `Ready (${state.voices.length} Voices Active)`;
@@ -983,6 +1015,7 @@
 
       populateVoiceDropdown();
       renderVoicesStudio();
+      updateVoiceUI();
     } catch (err) {
       console.warn('Could not load ElevenLabs voices:', err);
       if (elevenlabsStatusIndicator) {
@@ -1004,23 +1037,76 @@
       voiceSelectDropdown.appendChild(opt);
     });
 
+    if (state.selectedVoiceId) {
+      voiceSelectDropdown.value = state.selectedVoiceId;
+    }
+  }
+
+  if (voiceSelectDropdown) {
     voiceSelectDropdown.addEventListener('change', (e) => {
-      selectVoice(e.target.value);
+      selectVoice(e.target.value, true);
     });
   }
 
-  function selectVoice(voiceId) {
+  function selectVoice(voiceId, shouldSpeak = false) {
+    if (!state.voices || state.voices.length === 0) {
+      state.voices = [...DEFAULT_VOICES];
+    }
     const found = state.voices.find(v => v.id === voiceId);
     state.selectedVoiceId = voiceId;
-    state.selectedVoiceName = found ? found.name.split(' - ')[0] : 'Assistant';
+    const rawName = found ? found.name : 'Sarah';
+    state.selectedVoiceName = rawName.split(' - ')[0].trim();
     localStorage.setItem('ai_buddy_voice_id', state.selectedVoiceId);
     localStorage.setItem('ai_buddy_voice_name', state.selectedVoiceName);
 
-    if (activeVoiceName) activeVoiceName.textContent = `Voice: ${state.selectedVoiceName}`;
-    if (chatVoiceLabel) chatVoiceLabel.textContent = state.selectedVoiceName;
-    if (voiceSelectDropdown) voiceSelectDropdown.value = voiceId;
-
+    updateVoiceUI();
     renderVoicesStudio();
+
+    if (shouldSpeak) {
+      stopSpeaking();
+      speak(`Hi ${state.userName}! My voice is now ${state.selectedVoiceName}.`);
+    }
+  }
+
+  function cycleNextVoice() {
+    if (!state.voices || state.voices.length === 0) {
+      state.voices = [...DEFAULT_VOICES];
+    }
+    const currentIndex = state.voices.findIndex(v => v.id === state.selectedVoiceId);
+    const nextIndex = (currentIndex + 1) % state.voices.length;
+    const nextVoice = state.voices[nextIndex];
+    if (nextVoice) {
+      selectVoice(nextVoice.id, true);
+      showBanner(`Voice switched to ${state.selectedVoiceName}`);
+      setTimeout(() => {
+        if (banner) banner.classList.add('hidden');
+      }, 2500);
+    }
+  }
+
+  // Interactive Voice Toggle Badges
+  if (activeVoiceBadge) {
+    activeVoiceBadge.addEventListener('click', () => {
+      cycleNextVoice();
+    });
+    activeVoiceBadge.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        cycleNextVoice();
+      }
+    });
+  }
+
+  if (chatVoiceLabel) {
+    chatVoiceLabel.addEventListener('click', () => {
+      cycleNextVoice();
+    });
+    chatVoiceLabel.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        cycleNextVoice();
+      }
+    });
   }
 
   function renderVoicesStudio() {
@@ -1044,13 +1130,12 @@
           </div>
         </div>
         <button type="button" class="voice-test-btn" data-voice-id="${v.id}">
-          ${isSelected ? 'Selected' : 'Use Voice'}
+          ${isSelected ? '✓ Selected' : 'Use Voice'}
         </button>
       `;
 
       card.addEventListener('click', () => {
-        selectVoice(v.id);
-        speak(`Hi ${state.userName}! I am ${name}.`);
+        selectVoice(v.id, true);
       });
 
       voicesCardsContainer.appendChild(card);
@@ -1074,6 +1159,9 @@
     .catch(() => { });
 
   // --- Initial Setup ---
+  updateVoiceUI();
+  populateVoiceDropdown();
+  renderVoicesStudio();
   loadVoices();
   renderHistory();
 

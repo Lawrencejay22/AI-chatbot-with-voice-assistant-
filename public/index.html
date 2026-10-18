@@ -63,13 +63,16 @@
           <span class="pulse-dot"></span>
           <span class="status-label">Online</span>
         </div>
-        <div class="voice-badge" id="active-voice-badge">
-          <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14">
+        <div class="voice-badge" id="active-voice-badge" role="button" tabindex="0" title="Click to toggle assistant voice">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="13" height="13">
             <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z" />
             <path
               d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z" />
           </svg>
           <span id="active-voice-name">Voice: Sarah</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="10" height="10" class="voice-badge-chevron">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
         </div>
       </div>
 
@@ -449,7 +452,7 @@
 
             <div class="chat-header-center">
               <h2 class="chat-title">Ai Chat</h2>
-              <span class="chat-voice-pill" id="chat-voice-label" title="Current assistant voice">Sarah</span>
+              <span class="chat-voice-pill" id="chat-voice-label" role="button" tabindex="0" title="Click to toggle assistant voice">Sarah</span>
             </div>
 
             <div class="chat-header-actions">
