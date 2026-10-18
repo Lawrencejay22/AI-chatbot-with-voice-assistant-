@@ -1748,6 +1748,78 @@ body.standalone-welcome-page {
   height: 6px;
 }
 
+/* Code Block & Inline Code in Chat Bubbles */
+.bubble-code-container {
+  margin: 10px 0;
+  border-radius: 10px;
+  background: #090614;
+  border: 1px solid rgba(168, 85, 247, 0.32);
+  overflow: hidden;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+}
+
+.code-container-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.code-lang-tag {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #38bdf8;
+  letter-spacing: 0.06em;
+  font-family: 'Consolas', monospace;
+}
+
+.copy-code-inline-btn {
+  background: rgba(168, 85, 247, 0.25);
+  border: 1px solid rgba(192, 132, 252, 0.35);
+  color: #e2e8f0;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.copy-code-inline-btn:hover {
+  background: rgba(168, 85, 247, 0.5);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.bubble-code-pre {
+  margin: 0;
+  padding: 12px 14px;
+  overflow-x: auto;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 13px;
+  line-height: 1.55;
+  color: #f8fafc;
+  background: transparent;
+}
+
+.bubble-code-pre code {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+.bubble-inline-code {
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(168, 85, 247, 0.35);
+  color: #38bdf8;
+  padding: 2px 6px;
+  border-radius: 5px;
+  font-family: 'Consolas', monospace;
+  font-size: 13px;
+}
+
 .msg-meta-footer {
   display: flex;
   align-items: center;

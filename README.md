@@ -9,7 +9,7 @@ A modern, responsive AI companion application powered by OpenAI and ElevenLabs v
 Modern conversational interfaces and legacy voice assistants often suffer from key limitations that degrade the user experience:
 
 - **Text Fatigue and High Interaction Friction**:
-  - Traditional chatbots require constant keyboard typing, which is slow, tiring, and impractical when multitasking (e.g., cooking, studying, coding, or on mobile devices, then for driving).
+  - Traditional chatbots require constant keyboard typing, which is slow, tiring, and impractical when multitasking (e.g., cooking, studying, coding/programming, or on mobile devices, then for driving).
   - Users increasingly expect natural, hands-free conversational computing.
 - **Kitchen & Recipe Guidance Friction (Hands-Free Cooking Dilemma)**:
   - While cooking or baking, users' hands are often wet, oily, or covered in ingredients (e.g., preparing meals like *Adobo* or *Sinigang*, baking *Cakes*, or mixing drinks), making it messy and unhygienic to touch screens or type queries.

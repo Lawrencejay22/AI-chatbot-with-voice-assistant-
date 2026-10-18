@@ -481,6 +481,8 @@
   function stripMarkdownForSpeech(raw) {
     if (!raw) return '';
     return raw
+      .replace(/```[a-zA-Z0-9_-]*\n?([\s\S]*?)```/g, ' Here is the code example. ')
+      .replace(/`([^`]+)`/g, '$1')
       .replace(/[#*_`~]/g, '')
       .replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '')
       .replace(/^[•\-\*]\s+/gm, '')
@@ -493,10 +495,32 @@
     if (!rawText) return '';
     let text = escapeHtml(rawText);
 
-    // Convert bold **text** to <strong>text</strong>
+    // 1. Extract and preserve code blocks
+    const codeBlocks = [];
+    text = text.replace(/```([a-zA-Z0-9_-]*)\n?([\s\S]*?)```/g, (match, lang, code) => {
+      const language = (lang || 'code').trim();
+      const cleanCode = code.replace(/\n+$/, '');
+      const blockHtml = `
+        <div class="bubble-code-container">
+          <div class="code-container-header">
+            <span class="code-lang-tag">${language}</span>
+            <button type="button" class="copy-code-inline-btn" title="Copy code" onclick="navigator.clipboard.writeText(this.closest('.bubble-code-container').querySelector('code').innerText); this.innerText='Copied!'; setTimeout(()=>this.innerText='Copy', 1500);">Copy</button>
+          </div>
+          <pre class="bubble-code-pre"><code>${cleanCode}</code></pre>
+        </div>`;
+      const placeholder = `__CODE_BLOCK_${codeBlocks.length}__`;
+      codeBlocks.push(blockHtml);
+      return placeholder;
+    });
+
+    // 2. Format inline code `code`
+    text = text.replace(/`([^`\n]+)`/g, '<code class="bubble-inline-code">$1</code>');
+
+    // 3. Convert bold and italic markdown
     text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
     text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
 
+    // 4. Line by line parsing for steps, bullets, headers, and paragraphs
     const lines = text.split('\n');
     let formattedHtml = '';
 
@@ -507,7 +531,15 @@
         return;
       }
 
-      // Check for numbered steps (e.g. "1. Sear the meat:" or "1. Step")
+      // Check for code block placeholder
+      const codeMatch = trimmed.match(/^__CODE_BLOCK_(\d+)__$/);
+      if (codeMatch) {
+        const index = parseInt(codeMatch[1], 10);
+        formattedHtml += codeBlocks[index] || '';
+        return;
+      }
+
+      // Check for numbered steps (e.g. "1. Step" or "1) Step")
       const numMatch = trimmed.match(/^(\d+)[\.\)]\s+(.*)$/);
       if (numMatch) {
         formattedHtml += `
@@ -530,7 +562,7 @@
       }
 
       // Check for section headers (e.g., emojis or lines ending with colon)
-      const isHeader = /^([🍲🔥🛒🎂🍹👨‍🍳👉📌💡]|##|###)/.test(trimmed) || (trimmed.endsWith(':') && trimmed.length < 55);
+      const isHeader = /^([🍲🔥🛒🎂🍹👨‍🍳👉📌💡📚💻🧠⚡🚀🎯🛠️📖📝🔍]|##|###)/.test(trimmed) || (trimmed.endsWith(':') && trimmed.length < 55);
       if (isHeader) {
         const cleanHeader = trimmed.replace(/^#+\s*/, '');
         formattedHtml += `<div class="bubble-section-title">${cleanHeader}</div>`;

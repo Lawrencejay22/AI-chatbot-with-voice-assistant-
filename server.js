@@ -21,14 +21,27 @@ const ELEVENLABS_KEY = process.env.ELEVENLABS_API_KEY;
 const OPENAI_KEY = process.env.OPENAI_API_KEY;
 
 const SYSTEM_PROMPT = [
-  'You are Buddy, a friendly, conversational voice assistant and culinary cooking companion.',
-  'Your replies will be displayed in an interactive chat bubble and spoken aloud via text-to-speech.',
-  'When asked for recipes, food recommendations, desserts, or drinks (like adobo, sinigang, cakes, pastries, or beverages):',
-  'First, provide a headline explaining what the food or drink is, its flavor profile, and appeal.',
-  'Second, walk through step-by-step cooking or preparation instructions using numbered steps (1., 2., 3., 4.).',
-  'Third, conclude with a key ingredients checklist using clean bullet items (•).',
-  'Keep explanations conversational, easy to understand, and well-spaced.'
-].join(' ');
+  'You are Buddy, a friendly, intelligent voice companion specializing in study mentoring, programming guidance, and culinary recipes.',
+  'Your replies will be displayed visually in an interactive chat bubble and spoken aloud via text-to-speech.',
+  '',
+  'When helping with CODING and PROGRAMMING (e.g., JavaScript, Python, HTML/CSS, bugs, algorithms):',
+  '1. Headline & Concept: Explain the concept, logic, or bug clearly in 1-2 friendly sentences.',
+  '2. Code Example: Provide a clean, copy-ready snippet in markdown code blocks (```language). Keep snippets concise and readable.',
+  '3. Step-by-Step Breakdown: Walk through how the code works using numbered steps (1., 2., 3.).',
+  '4. Pro Tip: Conclude with a helpful best practice or gotcha to avoid.',
+  '',
+  'When helping with STUDYING, EXAM PREPARATION, or LEARNING CONCEPTS:',
+  '1. Core Idea: Explain the topic simply using intuitive analogies or the Feynman Technique.',
+  '2. Study Action Plan: Provide 3-4 structured, actionable study steps (1., 2., 3., 4.) using Active Recall or Spaced Repetition.',
+  '3. Key Takeaways: Conclude with clean bullet points (•) for quick memory review before exams.',
+  '',
+  'When answering RECIPES and FOOD/DRINK requests (e.g., Adobo, Sinigang, Cakes, Drinks):',
+  '1. Food Overview: Explain what the dish is and its flavor profile.',
+  '2. Step-by-Step Cooking: Walk through instructions using numbered steps (1., 2., 3.).',
+  '3. Ingredients Checklist: Conclude with key ingredients using bullet points (•).',
+  '',
+  'Keep spoken explanations natural, encouraging, and clear without unnecessary symbols.'
+].join('\n');
 
 app.get('/api/config', (req, res) => {
   res.json({ openaiConfigured: Boolean(OPENAI_KEY) });
@@ -134,11 +147,134 @@ function generateSmartFallback(messages) {
     ];
     return greetings[Math.floor(Math.random() * greetings.length)];
   }
-  if (/program|code|python|javascript|learn|develop|html|css/.test(lastMsg)) {
-    return "The best way to improve your programming skills is building hands-on projects, practicing algorithms, and reading documentation daily. Start with small features and scale up!";
+  if (/study|exam|learn|memorize|revision|homework|technique|pomodoro|feynman/.test(lastMsg)) {
+    return [
+      "📚 High-Performance Study Method: Active Recall & Pomodoro",
+      "Passive reading leads to rapid forgetting. Research proves that testing your memory actively and using timed focus intervals increases retention by over 300%.",
+      "",
+      "🎯 4-Step Study Action Plan:",
+      "1. Pomodoro Focus: Set a timer for 25 minutes of zero-distraction focus, followed by a 5-minute break.",
+      "2. The Blurting Technique: Close your notes and write or speak everything you remember from memory.",
+      "3. The Feynman Technique: Explain the concept out loud in simple terms as if teaching an 8-year-old.",
+      "4. Spaced Repetition: Review your weak points on Day 1, Day 3, and Day 7 to cement them in long-term memory.",
+      "",
+      "💡 Pro Study Tips:",
+      "• Solve past exam questions early instead of re-reading textbooks",
+      "• Keep your phone in another room during study blocks",
+      "• Get 7-8 hours of sleep—your brain consolidates memories while sleeping"
+    ].join('\n');
+  }
+
+  if (/javascript|js|node|typescript/.test(lastMsg)) {
+    return [
+      "💻 Modern JavaScript: Clean Arrow Functions & Array Methods",
+      "In modern JavaScript, array methods like map and filter allow you to transform and query data cleanly without cumbersome for loops.",
+      "",
+      "```javascript",
+      "// Example: Doubling numbers using .map()",
+      "const numbers = [1, 2, 3, 4, 5];",
+      "const doubled = numbers.map(num => num * 2);",
+      "console.log(doubled); // [2, 4, 6, 8, 10]",
+      "```",
+      "",
+      "⚡ How It Works (Step-by-Step):",
+      "1. Array Declaration: We declare an array of numbers using const for immutability.",
+      "2. Transformation: .map() iterates through each element and passes it to our concise arrow function.",
+      "3. New Array: It returns a brand new array with transformed values without mutating the original list.",
+      "",
+      "💡 Pro Tip:",
+      "• Always prefer const and let over var to avoid variable hoisting bugs"
+    ].join('\n');
+  }
+
+  if (/python|py/.test(lastMsg)) {
+    return [
+      "🐍 Python Essentials: Functions & List Comprehensions",
+      "Python is celebrated for its clean, human-readable syntax. List comprehensions offer an elegant way to create new lists based on existing iterables.",
+      "",
+      "```python",
+      "# Example: Filtering even numbers with list comprehension",
+      "numbers = [1, 2, 3, 4, 5, 6]",
+      "evens = [n for n in numbers if n % 2 == 0]",
+      "print(evens) # Output: [2, 4, 6]",
+      "```",
+      "",
+      "⚡ How It Works (Step-by-Step):",
+      "1. Iteration: The 'for n in numbers' loop traverses each item in the collection.",
+      "2. Condition: The 'if n % 2 == 0' filters out numbers that leave a remainder.",
+      "3. Construction: The result is gathered into a clean new list with optimal C-level execution speed.",
+      "",
+      "💡 Pro Tip:",
+      "• Use meaningful function names and Python type hints (def add(a: int) -> int) for clean collaboration"
+    ].join('\n');
+  }
+
+  if (/html|css|flexbox|grid|layout/.test(lastMsg)) {
+    return [
+      "🌐 Modern CSS: Centering Anything with Flexbox",
+      "Centering elements used to be notoriously tricky in CSS, but Flexbox makes horizontal and vertical alignment simple with just 3 lines of code.",
+      "",
+      "```css",
+      ".parent-container {",
+      "  display: flex;",
+      "  justify-content: center; /* Horizontally centers */",
+      "  align-items: center;     /* Vertically centers */",
+      "  min-height: 100vh;",
+      "}",
+      "```",
+      "",
+      "⚡ How It Works (Step-by-Step):",
+      "1. Enable Flex: 'display: flex' establishes a flex container context for all child elements.",
+      "2. Justify Content: Centers child items along the main axis (horizontal by default).",
+      "3. Align Items: Centers child items along the cross axis (vertical by default).",
+      "",
+      "💡 Pro Tip:",
+      "• Use CSS variables (--primary-color: #7c3aed) for effortless theme switching and consistent design tokens"
+    ].join('\n');
+  }
+
+  if (/debug|bug|error|exception|broken|fix/.test(lastMsg)) {
+    return [
+      "🛠️ 4-Step Code Debugging Checklist",
+      "Bugs are a natural part of programming. Following a methodical debugging routine saves hours of random guessing.",
+      "",
+      "🔍 Step-by-Step Debugging Protocol:",
+      "1. Read the Stack Trace: Look at the exact error name and line number in your console or terminal.",
+      "2. Reproduce Consistently: Identify the minimum steps or inputs required to trigger the failure.",
+      "3. Isolate with Logs or Breakpoints: Print the variables immediately before the failing line to verify assumptions.",
+      "4. Test the Smallest Fix: Make one small change at a time and verify both the fix and related features.",
+      "",
+      "💡 Pro Tip:",
+      "• When stuck for over 30 minutes, explain your code line-by-line to a rubber duck or take a 10-minute walk!"
+    ].join('\n');
+  }
+
+  if (/program|code|developer|coding|algorithm|data structure/.test(lastMsg)) {
+    return [
+      "🚀 Full-Stack Developer Growth Roadmap",
+      "The fastest way to learn programming is the 80/20 rule: spend 20% of your time studying theory, and 80% actively writing code and building projects.",
+      "",
+      "🎯 4 Stages of Mastering Code:",
+      "1. Fundamentals: Master variables, loops, conditional logic, functions, and data structures.",
+      "2. Project Building: Build real applications (like this AI Chatbot with voice synthesis!) rather than just watching tutorials.",
+      "3. Version Control: Use Git & GitHub daily to track commits, branches, and deploy to platforms like Vercel.",
+      "4. Problem Solving: Practice algorithms on platforms like LeetCode or Codewars to train algorithmic thinking.",
+      "",
+      "💡 Need help with code?",
+      "• Ask me about JavaScript, Python, CSS Flexbox, or how to debug any error!"
+    ].join('\n');
   }
   if (/who are you|what are you|what can you do|about you/.test(lastMsg)) {
-    return "I am your Personal AI Buddy! I can converse with you, guide you step-by-step through cooking delicious dishes, answer questions, and speak replies out loud using high quality voice synthesis.";
+    return [
+      "🤖 I am Buddy, Your AI Companion!",
+      "I am here to assist you across study, programming, cooking, and daily voice conversations.",
+      "",
+      "✨ Here is what I can do for you:",
+      "• 💻 Programming Mentor: Explain coding concepts (JS, Python, CSS), provide code snippets, and debug errors",
+      "• 📚 Study Coach: Break down complex topics using the Feynman technique, Active Recall, and Pomodoro planning",
+      "• 🍲 Culinary Guide: Walk you through delicious recipes (Adobo, Sinigang, Cakes, Drinks) step-by-step",
+      "• 🎙️ Natural Voice Synthesis: Speak responses aloud using ElevenLabs ultra-realistic voices"
+    ].join('\n');
   }
   if (/weather|forecast|rain|temperature/.test(lastMsg)) {
     return "I don't have access to live GPS sensor data right now, but you can check your local weather app or let me know what city you're curious about!";
