@@ -453,7 +453,7 @@
         ${authorIconHtml}
         <span>${authorName}</span>
       </div>
-      <div class="msg-bubble-box">${escapeHtml(text)}</div>
+      <div class="msg-bubble-box">${formatMessageText(text)}</div>
       ${!isUser ? `
         <div class="msg-meta-footer">
           <button type="button" class="replay-audio-btn" title="Replay voice audio">
@@ -476,6 +476,72 @@
     chatEl.appendChild(row);
     scrollChatToBottom();
     return row;
+  }
+
+  function stripMarkdownForSpeech(raw) {
+    if (!raw) return '';
+    return raw
+      .replace(/[#*_`~]/g, '')
+      .replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '')
+      .replace(/^[•\-\*]\s+/gm, '')
+      .replace(/^\d+[\.\)]\s+/gm, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  function formatMessageText(rawText) {
+    if (!rawText) return '';
+    let text = escapeHtml(rawText);
+
+    // Convert bold **text** to <strong>text</strong>
+    text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
+
+    const lines = text.split('\n');
+    let formattedHtml = '';
+
+    lines.forEach((line) => {
+      const trimmed = line.trim();
+      if (!trimmed) {
+        formattedHtml += '<div class="bubble-spacer"></div>';
+        return;
+      }
+
+      // Check for numbered steps (e.g. "1. Sear the meat:" or "1. Step")
+      const numMatch = trimmed.match(/^(\d+)[\.\)]\s+(.*)$/);
+      if (numMatch) {
+        formattedHtml += `
+          <div class="bubble-step-row">
+            <span class="bubble-step-badge">${numMatch[1]}</span>
+            <span class="bubble-step-text">${numMatch[2]}</span>
+          </div>`;
+        return;
+      }
+
+      // Check for bullet items (e.g. "• Item", "- Item", "* Item")
+      const bulletMatch = trimmed.match(/^[•\-\*]\s+(.*)$/);
+      if (bulletMatch) {
+        formattedHtml += `
+          <div class="bubble-bullet-row">
+            <span class="bubble-bullet-icon">✦</span>
+            <span class="bubble-bullet-text">${bulletMatch[1]}</span>
+          </div>`;
+        return;
+      }
+
+      // Check for section headers (e.g., emojis or lines ending with colon)
+      const isHeader = /^([🍲🔥🛒🎂🍹👨‍🍳👉📌💡]|##|###)/.test(trimmed) || (trimmed.endsWith(':') && trimmed.length < 55);
+      if (isHeader) {
+        const cleanHeader = trimmed.replace(/^#+\s*/, '');
+        formattedHtml += `<div class="bubble-section-title">${cleanHeader}</div>`;
+        return;
+      }
+
+      // Standard paragraph
+      formattedHtml += `<p class="bubble-paragraph">${trimmed}</p>`;
+    });
+
+    return formattedHtml;
   }
 
   function escapeHtml(str) {
@@ -503,7 +569,8 @@
 
   // --- Voice Synthesis (ElevenLabs with Web Speech Fallback) ---
   async function speak(text) {
-    if (!text) return;
+    const cleanSpeechText = stripMarkdownForSpeech(text);
+    if (!cleanSpeechText) return;
     stopSpeaking();
 
     // Show equalizer UI
@@ -515,7 +582,7 @@
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          text,
+          text: cleanSpeechText,
           voiceId: state.selectedVoiceId
         })
       });
@@ -529,12 +596,12 @@
       state.currentAudio = new Audio(URL.createObjectURL(blob));
       state.currentAudio.onended = stopSpeaking;
       state.currentAudio.onerror = () => {
-        fallbackBrowserSpeak(text);
+        fallbackBrowserSpeak(cleanSpeechText);
       };
       await state.currentAudio.play();
     } catch (err) {
       console.warn('ElevenLabs API unavailable, using browser speech synthesis fallback:', err.message);
-      fallbackBrowserSpeak(text);
+      fallbackBrowserSpeak(cleanSpeechText);
     }
   }
 

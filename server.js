@@ -21,13 +21,13 @@ const ELEVENLABS_KEY = process.env.ELEVENLABS_API_KEY;
 const OPENAI_KEY = process.env.OPENAI_API_KEY;
 
 const SYSTEM_PROMPT = [
-  'You are a friendly, conversational voice assistant and culinary companion.',
-  'Your replies are spoken aloud with text-to-speech, so keep them natural, engaging, and spoken-friendly.',
-  'Never use markdown, bullet point characters, or special symbols.',
-  'When asked for recipes, food recommendations, desserts, or drinks (like adobo, sinigang, cakes, pastries, or cocktails):',
-  'First, explain what the food or drink is, its flavor profile, and appeal.',
-  'Second, walk through the step-by-step cooking or preparation process conversationally.',
-  'Third, conclude with the key ingredients and measurements required.'
+  'You are Buddy, a friendly, conversational voice assistant and culinary cooking companion.',
+  'Your replies will be displayed in an interactive chat bubble and spoken aloud via text-to-speech.',
+  'When asked for recipes, food recommendations, desserts, or drinks (like adobo, sinigang, cakes, pastries, or beverages):',
+  'First, provide a headline explaining what the food or drink is, its flavor profile, and appeal.',
+  'Second, walk through step-by-step cooking or preparation instructions using numbered steps (1., 2., 3., 4.).',
+  'Third, conclude with a key ingredients checklist using clean bullet items (•).',
+  'Keep explanations conversational, easy to understand, and well-spaced.'
 ].join(' ');
 
 app.get('/api/config', (req, res) => {
@@ -38,19 +38,93 @@ function generateSmartFallback(messages) {
   const lastMsg = (messages[messages.length - 1]?.content || '').toLowerCase();
   
   if (/adobo/.test(lastMsg)) {
-    return "Chicken or pork adobo is the quintessential Filipino comfort dish, featuring savory, tangy, and rich garlic-soy flavors with a hint of black pepper and bay leaves. To cook it, first sear your chicken or pork in a hot pan until golden, sauté minced garlic and onions, pour in soy sauce, vinegar, water, and whole peppercorns with bay leaves, then simmer gently for 30 to 40 minutes until tender and slightly reduced. Finally, the key ingredients you need are one kilogram of meat, half a cup of soy sauce, one-third cup of cane vinegar, a head of crushed garlic, two bay leaves, black peppercorns, and a spoonful of cooking oil.";
+    return [
+      "🍲 What is Adobo?",
+      "Chicken or Pork Adobo is the quintessential Filipino comfort dish, featuring savory, tangy, and rich garlic-soy flavors with a hint of black pepper and bay leaves.",
+      "",
+      "🔥 How to Cook (Step-by-Step):",
+      "1. Sear the meat: Brown chicken or pork cuts in a hot pan until golden.",
+      "2. Sauté aromatics: Add minced garlic and sliced onions, sautéing until fragrant.",
+      "3. Simmer: Pour in soy sauce, cane vinegar, water, bay leaves, and whole black peppercorns.",
+      "4. Reduce: Simmer gently on low heat for 30 to 40 minutes until meat is tender and the sauce thickens.",
+      "",
+      "🛒 Key Ingredients:",
+      "• 1 kg chicken or pork cuts",
+      "• 1/2 cup soy sauce & 1/3 cup cane vinegar",
+      "• 1 whole head of crushed garlic & 2 bay leaves",
+      "• 1 tsp whole black peppercorns & 1 tbsp cooking oil"
+    ].join('\n');
   }
   if (/sinigang/.test(lastMsg)) {
-    return "Sinigang is a famous Filipino sour soup celebrated for its mouthwatering tamarind broth loaded with tender pork or shrimp and fresh greens. To cook it, boil your pork ribs in water with chopped onions and tomatoes until tender, stir in tamarind soup base or fresh sampaloc, then add radish, eggplant, long green chilies, and finish with water spinach kangkong for the last two minutes of simmering. For the ingredients, you will need pork ribs, fresh tomatoes, red onion, tamarind broth mix, daikon radish, string beans, kangkong, green finger chilies, and fish sauce to taste.";
+    return [
+      "🍲 What is Sinigang?",
+      "Sinigang is a famous Filipino sour soup celebrated for its mouthwatering tamarind broth loaded with tender pork or shrimp and fresh greens.",
+      "",
+      "🔥 How to Cook (Step-by-Step):",
+      "1. Boil meat: Simmer pork ribs in water with sliced tomatoes and onions until fork-tender.",
+      "2. Add souring base: Stir in tamarind soup base or fresh sampaloc broth to your preferred sourness.",
+      "3. Cook vegetables: Add sliced radish, eggplant, string beans, and green finger chilies.",
+      "4. Finish: Add fresh kangkong (water spinach) during the final 2 minutes of simmering.",
+      "",
+      "🛒 Key Ingredients:",
+      "• 1 kg pork ribs (or shrimp/fish)",
+      "• 1 packet tamarind soup mix (or fresh tamarind)",
+      "• Fresh tomatoes & red onion",
+      "• Daikon radish, eggplant, string beans & green chilies",
+      "• Fresh kangkong & fish sauce to taste"
+    ].join('\n');
   }
   if (/cake|bake|pastry|dessert|sweet/.test(lastMsg)) {
-    return "A moist chocolate sponge cake is a classic sweet dessert with a rich cocoa aroma and tender crumb. To make it, whisk together your flour, sugar, and cocoa powder in a bowl, mix in eggs, milk, melted butter, and vanilla extract until smooth, pour into a greased baking pan, and bake at 350 degrees Fahrenheit or 175 Celsius for about 30 to 35 minutes until a toothpick comes out clean. For the ingredients, gather two cups of all-purpose flour, two cups of sugar, three-quarters cup of cocoa powder, two eggs, one cup of milk, half a cup of melted butter, two teaspoons of baking powder, and a splash of vanilla.";
+    return [
+      "🎂 Classic Chocolate Cake",
+      "A moist, decadent chocolate sponge cake with a rich cocoa aroma and velvety tender crumb.",
+      "",
+      "🔥 How to Bake (Step-by-Step):",
+      "1. Dry ingredients: Whisk together flour, sugar, cocoa powder, and baking powder in a bowl.",
+      "2. Wet ingredients: Mix in eggs, milk, melted butter, and vanilla extract until silky smooth.",
+      "3. Bake: Pour into a greased baking pan and bake at 350°F (175°C) for 30 to 35 minutes.",
+      "4. Cool: Let cool completely before slicing or topping with your favorite frosting.",
+      "",
+      "🛒 Key Ingredients:",
+      "• 2 cups all-purpose flour",
+      "• 2 cups sugar & 3/4 cup unsweetened cocoa powder",
+      "• 2 large eggs & 1 cup milk",
+      "• 1/2 cup melted butter & 1 tsp vanilla extract",
+      "• 2 tsp baking powder & 1/2 tsp salt"
+    ].join('\n');
   }
   if (/drink|beverage|cocktail|smoothie|coffee|tea|juice/.test(lastMsg)) {
-    return "A refreshing mango calamansi cooler is a tropical beverage that balances sweet mango puree with citrusy calamansi zest over crushed ice. To prepare it, blend fresh ripe mango cheeks until smooth, stir in fresh calamansi juice and honey or simple syrup, pour into a tall glass filled with ice, and top with sparkling soda water. You will need two ripe mangoes, three tablespoons of calamansi or lime juice, two tablespoons of honey, crushed ice, and one cup of sparkling water.";
+    return [
+      "🍹 Mango Calamansi Cooler",
+      "A refreshing tropical beverage that balances sweet ripe mango puree with tangy citrus over crushed ice.",
+      "",
+      "🔥 How to Prepare (Step-by-Step):",
+      "1. Puree mango: Blend fresh ripe mango cheeks until silky smooth.",
+      "2. Mix flavor: Stir in fresh calamansi juice and honey or simple syrup.",
+      "3. Assemble: Fill a tall glass with crushed ice, pour the mango mixture, and top with sparkling soda water.",
+      "4. Garnish: Add a fresh mint sprig and citrus slice before serving.",
+      "",
+      "🛒 Key Ingredients:",
+      "• 2 sweet ripe mangoes",
+      "• 3 tbsp fresh calamansi or lime juice",
+      "• 2 tbsp honey or simple syrup",
+      "• Crushed ice & 1 cup sparkling soda water",
+      "• Fresh mint leaves"
+    ].join('\n');
   }
   if (/recipe|cook|food|dish|dinner|lunch|breakfast/.test(lastMsg)) {
-    return "I would love to help you cook! I can guide you through classic savory dishes like Adobo and Sinigang, delicious baked cakes, desserts, or refreshing beverages. Just tell me what you feel like making, and I will explain the dish, give you step-by-step cooking directions, and list the exact ingredients!";
+    return [
+      "👨‍🍳 What Would You Like to Cook?",
+      "I can guide you step-by-step through savory favorites, delicious baked desserts, or refreshing drinks!",
+      "",
+      "👉 Try asking me about:",
+      "• 'How do I cook Chicken Adobo?'",
+      "• 'Give me a Pork Sinigang recipe'",
+      "• 'How to bake a chocolate cake'",
+      "• 'Recommend a refreshing summer drink'",
+      "",
+      "I will break down the dish, walk you through the steps, and list all ingredients!"
+    ].join('\n');
   }
   if (/hello|hi|hey|greetings|morning|evening|afternoon/.test(lastMsg)) {
     const greetings = [
