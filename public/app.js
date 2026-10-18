@@ -53,6 +53,7 @@
   // Voice Talk Overlay
   const voiceTalkOverlay = document.getElementById('voice-talk-overlay');
   const closeVoiceOverlayBtn = document.getElementById('close-voice-overlay-btn');
+  const btnVoiceOverlaySend = document.getElementById('btn-voice-overlay-send');
   const btnVoiceOverlayStop = document.getElementById('btn-voice-overlay-stop');
   const voiceOverlayStatus = document.getElementById('voice-overlay-status');
   const voiceOverlayTranscript = document.getElementById('voice-overlay-transcript');
@@ -64,6 +65,7 @@
   // Settings elements
   const settingUserName = document.getElementById('setting-user-name');
   const settingSpeakToggle = document.getElementById('setting-speak-toggle');
+  const settingAutoSendToggle = document.getElementById('setting-auto-send-toggle');
   const settingCustomKey = document.getElementById('setting-custom-key');
   const openaiStatusIndicator = document.getElementById('openai-status-indicator');
   const elevenlabsStatusIndicator = document.getElementById('elevenlabs-status-indicator');
@@ -83,6 +85,7 @@
     currentTab: 'home',
     userName: localStorage.getItem('ai_buddy_user_name') || 'Sakib',
     speakReplies: localStorage.getItem('ai_buddy_speak') !== 'false',
+    autoSendVoice: localStorage.getItem('ai_buddy_auto_send_voice') === 'true', // default false so mobile speech does not prematurely send
     selectedVoiceId: localStorage.getItem('ai_buddy_voice_id') || 'EXAVITQu4vr4xnSDxMaL',
     selectedVoiceName: localStorage.getItem('ai_buddy_voice_name') || 'Sarah',
     customApiKey: localStorage.getItem('ai_buddy_custom_key') || '',
@@ -708,6 +711,17 @@
     });
   }
 
+  if (settingAutoSendToggle) {
+    settingAutoSendToggle.checked = state.autoSendVoice;
+    settingAutoSendToggle.addEventListener('change', (e) => {
+      state.autoSendVoice = e.target.checked;
+      localStorage.setItem('ai_buddy_auto_send_voice', state.autoSendVoice);
+      if (micBtn && !isListening) {
+        micBtn.title = state.autoSendVoice ? 'Speak message (auto-sends on pause)' : 'Speak message (dictate into text box)';
+      }
+    });
+  }
+
   function updateSpeakerIcon() {
     const speakerSvg = document.getElementById('speaker-icon');
     if (speakerSvg) {
@@ -834,6 +848,7 @@
   let isListening = false;
   let manualStop = false;
   let transcribedText = '';
+  let initialInputText = '';
 
   if (SR) {
     recognition = new SR();
@@ -845,9 +860,13 @@
       isListening = true;
       manualStop = false;
       transcribedText = '';
+      initialInputText = inputEl ? inputEl.value : '';
+
       if (micBtn) {
         micBtn.classList.add('listening');
-        micBtn.title = 'Listening... tap to send';
+        micBtn.title = state.autoSendVoice
+          ? 'Listening... will send on silence (tap to cancel)'
+          : 'Listening... tap to finish dictation';
       }
       if (islandEq) islandEq.classList.remove('hidden');
       if (voiceOverlayStatus) voiceOverlayStatus.textContent = 'Listening...';
@@ -859,9 +878,10 @@
         if (e.results[i].isFinal) transcribedText += e.results[i][0].transcript;
         else interim += e.results[i][0].transcript;
       }
-      const full = (transcribedText + interim).trimStart();
-      if (inputEl) inputEl.value = full;
-      if (voiceOverlayTranscript) voiceOverlayTranscript.textContent = full || 'Listening to your voice...';
+      const spoken = (transcribedText + interim).trimStart();
+      const combined = initialInputText ? (initialInputText.trim() + ' ' + spoken).trim() : spoken;
+      if (inputEl) inputEl.value = combined;
+      if (voiceOverlayTranscript) voiceOverlayTranscript.textContent = combined || 'Listening to your voice...';
     };
 
     recognition.onerror = (e) => {
@@ -873,15 +893,20 @@
       isListening = false;
       if (micBtn) {
         micBtn.classList.remove('listening');
-        micBtn.title = 'Speak message';
+        micBtn.title = state.autoSendVoice ? 'Speak message (auto-sends on pause)' : 'Speak message (dictate into text box)';
       }
       if (islandEq) islandEq.classList.add('hidden');
 
-      if (!manualStop) {
-        const textToSend = (transcribedText || (inputEl && inputEl.value) || '').trim();
-        if (textToSend) {
-          if (voiceTalkOverlay) voiceTalkOverlay.classList.add('hidden');
-          handleSendMessage(textToSend);
+      const textToSend = ((inputEl && inputEl.value) || transcribedText || '').trim();
+
+      // Only auto-send if the setting is enabled AND user didn't manually cancel
+      if (state.autoSendVoice && !manualStop && textToSend) {
+        if (voiceTalkOverlay) voiceTalkOverlay.classList.add('hidden');
+        handleSendMessage(textToSend);
+      } else {
+        // Dictation mode: keep text in inputEl for user to review and send
+        if (voiceOverlayStatus) {
+          voiceOverlayStatus.textContent = textToSend ? 'Voice captured! Tap Send to submit.' : 'Listening ended';
         }
       }
     };
@@ -893,8 +918,8 @@
       } catch (err) { }
     }
 
-    function stopListening() {
-      manualStop = true;
+    function stopListening(sendImmediately = false) {
+      manualStop = !sendImmediately;
       if (recognition && isListening) {
         recognition.stop();
       }
@@ -903,7 +928,14 @@
     if (micBtn) {
       micBtn.addEventListener('click', () => {
         if (isListening) {
-          stopListening();
+          if (state.autoSendVoice) {
+            // In auto-send mode, tapping mic sends immediately
+            stopListening(true);
+          } else {
+            // In dictation mode, tapping mic finishes speech and focuses the input box
+            stopListening(false);
+            if (inputEl) inputEl.focus();
+          }
         } else {
           startListening();
         }
@@ -921,16 +953,27 @@
       });
     }
 
+    if (btnVoiceOverlaySend) {
+      btnVoiceOverlaySend.addEventListener('click', () => {
+        const text = ((inputEl && inputEl.value) || transcribedText || '').trim();
+        stopListening(false);
+        if (voiceTalkOverlay) voiceTalkOverlay.classList.add('hidden');
+        if (text) {
+          handleSendMessage(text);
+        }
+      });
+    }
+
     if (closeVoiceOverlayBtn) {
       closeVoiceOverlayBtn.addEventListener('click', () => {
-        stopListening();
+        stopListening(false);
         if (voiceTalkOverlay) voiceTalkOverlay.classList.add('hidden');
       });
     }
 
     if (btnVoiceOverlayStop) {
       btnVoiceOverlayStop.addEventListener('click', () => {
-        stopListening();
+        stopListening(false);
         if (voiceTalkOverlay) voiceTalkOverlay.classList.add('hidden');
       });
     }

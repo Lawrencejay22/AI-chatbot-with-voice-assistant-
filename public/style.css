@@ -2042,8 +2042,35 @@ body.standalone-welcome-page {
   margin-bottom: 24px;
 }
 
-.btn-voice-stop {
+.voice-talk-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.btn-voice-send {
   padding: 12px 28px;
+  border-radius: var(--radius-full);
+  background: linear-gradient(135deg, #8b5cf6, #6366f1);
+  border: 1px solid rgba(139, 92, 246, 0.5);
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+  transition: all var(--transition-fast);
+}
+
+.btn-voice-send:hover {
+  filter: brightness(1.15);
+  transform: translateY(-1px);
+}
+
+.btn-voice-stop {
+  padding: 12px 24px;
   border-radius: var(--radius-full);
   background: rgba(244, 63, 94, 0.2);
   border: 1px solid rgba(244, 63, 94, 0.5);

@@ -506,6 +506,7 @@
             <div class="voice-talk-sub" id="voice-overlay-transcript">Speak your question clearly into your microphone
             </div>
             <div class="voice-talk-controls">
+              <button type="button" class="btn-voice-send" id="btn-voice-overlay-send">Send Message</button>
               <button type="button" class="btn-voice-stop" id="btn-voice-overlay-stop">End Voice Mode</button>
             </div>
           </div>
@@ -595,6 +596,16 @@
                 </div>
                 <label class="toggle-switch">
                   <input type="checkbox" id="setting-speak-toggle" checked />
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <div class="setting-item-toggle">
+                <div>
+                  <div class="toggle-title">Auto-send voice input</div>
+                  <div class="toggle-desc">Automatically send when silence is detected (turn off to review first)</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="setting-auto-send-toggle" />
                   <span class="slider"></span>
                 </label>
               </div>
