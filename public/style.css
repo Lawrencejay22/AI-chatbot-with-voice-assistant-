@@ -782,12 +782,13 @@ body:not(.desktop-mode) .mobile-phone-notch {
    SCREEN VIEWS MANAGEMENT
    ========================================================== */
 .screen-view {
-  flex: 1;
+  flex: 1 1 0%;
+  min-height: 0;
   display: none;
   flex-direction: column;
   position: relative;
   overflow: hidden;
-  height: 100%;
+  width: 100%;
 }
 
 .screen-view.active {
@@ -1128,7 +1129,7 @@ body.standalone-welcome-page {
 .home-scroll-container {
   flex: 1;
   overflow-y: auto;
-  padding: 10px 20px 80px;
+  padding: 10px 20px 24px;
   display: flex;
   flex-direction: column;
   gap: 24px;
@@ -2017,8 +2018,9 @@ body.standalone-welcome-page {
 
 /* Chat Input Composer (Matching design mockup pill) */
 .chat-composer {
-  padding: 12px 20px 24px;
+  padding: 10px 16px 12px;
   background: #090714;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
   flex-shrink: 0;
 }
 
@@ -2122,7 +2124,7 @@ body.standalone-welcome-page {
 .voices-scroll-container, .settings-scroll-container {
   flex: 1;
   overflow-y: auto;
-  padding: 16px 20px 80px;
+  padding: 16px 20px 24px;
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -2431,18 +2433,18 @@ body.standalone-welcome-page {
    BOTTOM NAVIGATION BAR (Exact match to design mockup)
    ========================================================== */
 .mobile-bottom-nav {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 68px;
-  background: rgba(12, 9, 23, 0.92);
+  position: relative;
+  flex-shrink: 0;
+  height: 60px;
+  height: calc(60px + env(safe-area-inset-bottom, 0px));
+  background: rgba(12, 9, 23, 0.96);
   backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border-top: 1px solid var(--border-subtle);
   display: flex;
   align-items: center;
   justify-content: space-around;
-  padding: 0 10px;
+  padding: 0 10px env(safe-area-inset-bottom, 0px);
   z-index: 20;
 }
 
@@ -2550,14 +2552,155 @@ body.standalone-welcome-page {
   .main-shell {
     height: 100vh;
     height: 100dvh;
+    width: 100vw;
+    overflow: hidden;
   }
 
   .device-frame {
     width: 100%;
     height: 100%;
+    max-width: 100vw;
     border-radius: 0;
     border: none;
     box-shadow: none;
+  }
+
+  /* Safe-area insets for mobile headers */
+  .chat-header {
+    padding: max(10px, env(safe-area-inset-top, 0px)) 14px 10px;
+  }
+
+  .screen-header {
+    padding: max(12px, env(safe-area-inset-top, 0px)) 16px 12px;
+  }
+
+  /* Chat screen mobile layout */
+  .chat-messages {
+    padding: 12px 14px 14px;
+    gap: 12px;
+  }
+
+  .chat-msg-row {
+    max-width: 92%;
+  }
+
+  .msg-bubble-box {
+    padding: 12px 14px;
+    font-size: 14px;
+  }
+
+  .bubble-step-row {
+    padding: 8px 10px;
+    gap: 8px;
+    font-size: 13.5px;
+  }
+
+  .bubble-code-pre {
+    padding: 10px 12px;
+    font-size: 12.5px;
+  }
+
+  .chat-composer {
+    padding: 8px 12px 10px;
+  }
+
+  .composer-pill {
+    padding: 3px 6px 3px 12px;
+  }
+
+  .composer-pill input {
+    font-size: 16px; /* Prevents iOS WebKit auto-zoom */
+    height: 38px;
+  }
+
+  .composer-icon-btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .composer-icon-btn svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  /* Form inputs font-size to prevent iOS auto-zoom */
+  .settings-input,
+  .settings-select {
+    font-size: 16px !important;
+  }
+
+  /* Hide bottom nav when typing in chat to maximize keyboard area */
+  body:has(.chat-composer:focus-within) .mobile-bottom-nav,
+  body.keyboard-open .mobile-bottom-nav {
+    display: none !important;
+  }
+
+  body:has(.chat-composer:focus-within) .chat-composer,
+  body.keyboard-open .chat-composer {
+    padding-bottom: max(10px, env(safe-area-inset-bottom, 0px));
+  }
+}
+
+/* Small mobile devices (e.g. iPhone SE, 360-400px width) */
+@media (max-width: 480px) {
+  .home-scroll-container {
+    padding: 10px 14px 20px;
+    gap: 18px;
+  }
+
+  .action-cards-grid {
+    gap: 10px;
+  }
+
+  .action-card {
+    padding: 14px 12px;
+  }
+
+  .talk-card .card-title {
+    font-size: 19px;
+  }
+
+  .talk-card .card-sub-tip {
+    font-size: 11px;
+  }
+
+  .chat-card .card-title-sm,
+  .image-card .card-title-sm {
+    font-size: 13.5px;
+  }
+
+  .card-icon-circle {
+    width: 38px;
+    height: 38px;
+    margin-bottom: 14px;
+  }
+
+  .card-icon-circle svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .voices-scroll-container,
+  .settings-scroll-container {
+    padding: 12px 14px 20px;
+  }
+
+  .tab-btn {
+    padding: 6px 8px;
+  }
+
+  .tab-text {
+    font-size: 10px;
+  }
+
+  .tab-icon svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .icon-tiny-btn {
+    width: 32px;
+    height: 32px;
   }
 }
 

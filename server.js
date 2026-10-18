@@ -51,7 +51,7 @@ app.get('/api/config', (req, res) => {
 
 function generateSmartFallback(messages) {
   const lastMsg = (messages[messages.length - 1]?.content || '').toLowerCase();
-  
+
   if (/adobo/.test(lastMsg)) {
     return [
       "🍲 What is Adobo?",
@@ -300,7 +300,7 @@ function generateSmartFallback(messages) {
       "3. Construction: The result is gathered into a clean new list with optimal C-level execution speed.",
       "",
       "💡 Pro Tip:",
-      "• Use meaningful function names and Python type hints (def add(a: int) -> int) for clean collaboration"
+      "• Use meaningful function names and Python type hints (def add(a: int) -> int) for clean collaboration",
     ].join('\n');
   }
 
@@ -380,7 +380,7 @@ function generateSmartFallback(messages) {
   if (/thank|thanks|awesome|great|cool|good job/.test(lastMsg)) {
     return "You're very welcome! I'm always here to assist you whenever you need help.";
   }
-  
+
   return `That's an interesting question about "${messages[messages.length - 1]?.content?.slice(0, 30)}...". I'm here to help you dive deeper into that or assist with any coding and creative challenges you have!`;
 }
 
@@ -397,10 +397,10 @@ app.post('/api/chat', async (req, res) => {
 
   if (!apiKeyToUse) {
     const reply = generateSmartFallback(history);
-    return res.json({ 
-      reply, 
-      isFallback: true, 
-      notice: 'OPENAI_API_KEY is not set. Responded with smart offline assistant mode.' 
+    return res.json({
+      reply,
+      isFallback: true,
+      notice: 'OPENAI_API_KEY is not set. Responded with smart offline assistant mode.'
     });
   }
 
@@ -422,10 +422,10 @@ app.post('/api/chat', async (req, res) => {
       console.warn('OpenAI upstream warning:', detail);
       // Fallback gracefully so speech synthesis & conversation never break
       const fallbackReply = generateSmartFallback(history);
-      return res.json({ 
-        reply: fallbackReply, 
-        isFallback: true, 
-        notice: 'OpenAI quota exhausted or billing issue. Showing smart fallback response.' 
+      return res.json({
+        reply: fallbackReply,
+        isFallback: true,
+        notice: 'OpenAI quota exhausted or billing issue. Showing smart fallback response.'
       });
     }
 
@@ -437,10 +437,10 @@ app.post('/api/chat', async (req, res) => {
     res.json({ reply, isFallback: false });
   } catch (err) {
     console.error('Chat error:', err);
-    res.json({ 
-      reply: generateSmartFallback(history), 
-      isFallback: true, 
-      notice: `Network error reaching OpenAI (${err.message}). Using offline buddy response.` 
+    res.json({
+      reply: generateSmartFallback(history),
+      isFallback: true,
+      notice: `Network error reaching OpenAI (${err.message}). Using offline buddy response.`
     });
   }
 });

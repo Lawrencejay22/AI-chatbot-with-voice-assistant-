@@ -804,6 +804,16 @@
     });
   }
 
+  if (inputEl) {
+    inputEl.addEventListener('focus', () => {
+      document.body.classList.add('keyboard-open');
+      setTimeout(scrollChatToBottom, 150);
+    });
+    inputEl.addEventListener('blur', () => {
+      document.body.classList.remove('keyboard-open');
+    });
+  }
+
   // --- Voice Input Speech Recognition ---
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   let recognition = null;
